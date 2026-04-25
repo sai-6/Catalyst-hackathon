@@ -17,17 +17,19 @@ if "skills" not in st.session_state:
 if "answers" not in st.session_state:
     st.session_state.answers = {}
 
-# ---------------- SECURITY CHECK ----------------
-if not os.getenv("GOOGLE_API_KEY") and "GOOGLE_API_KEY" not in st.secrets:
-    st.error("❌ API key missing")
+# ---------------- API CHECK ----------------
+API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+
+if not API_KEY:
+    st.error("❌ API key not configured.")
     st.stop()
 
-# ---------------- NEW ASSESSMENT ----------------
+# ---------------- RESET ----------------
 if st.button("🆕 New Assessment"):
     st.session_state.clear()
     st.rerun()
 
-# ---------------- DEMO MODE (IMPORTANT: BEFORE UI) ----------------
+# ---------------- DEMO MODE ----------------
 if st.button("🎯 Load Demo Scenario"):
     st.session_state.jd = """We are hiring an HR Executive with strong skills in Communication,
 Conflict Resolution, Emotional Intelligence, Recruitment, and Employee Engagement."""
@@ -56,26 +58,19 @@ Strong in empathy and emotional understanding. No corporate HR experience."""
 
 # ---------------- TITLE ----------------
 st.title("🧠 SkillBridge AI")
-st.subheader("AI-Powered Skill Assessment & Learning Agent")
 
-# ---------------- INPUTS ----------------
 jd = st.text_area("Job Description", key="jd")
 resume = st.text_area("Resume", key="resume")
 
-# ---------------- SKILL EXTRACTION ----------------
+# ---------------- SKILLS ----------------
 if st.button("Extract Skills"):
     st.session_state.skills = extract_skills(jd)
 
-# ---------------- INTERVIEW ----------------
 answers = {}
 
 if st.session_state.skills:
-    st.write("### 🧩 Extracted Skills")
-    st.write(st.session_state.skills)
-
     for i, skill in enumerate(st.session_state.skills):
         st.subheader(skill)
-
         st.write(generate_questions(skill))
 
         answers[skill] = st.text_area(
@@ -88,22 +83,8 @@ if st.session_state.skills:
 if st.button("Run Assessment"):
     result = run_assessment(jd, resume, answers)
 
-    st.write("## 📊 Results")
-
-    st.write(f"### Overall Score: {result['overall_score']}")
-    st.write(f"### Confidence: {result['confidence']}%")
-
-    if result["overall_score"] >= 4:
-        st.success("✅ Strong Fit")
-    elif result["overall_score"] >= 3:
-        st.warning("⚠️ Trainable")
-    else:
-        st.error("❌ Not Ready")
+    st.write(f"Score: {result['overall_score']}")
+    st.write(f"Confidence: {result['confidence']}%")
 
     for r in result["skills"]:
-        st.markdown(f"### {r['skill']}")
-        st.write(f"Score: {r['score']} | Required: {r['required']} | Gap: {r['gap']}")
-        st.write(r["feedback"])
-
-        with st.expander("📘 Learning Plan"):
-            st.write(r["learning_plan"])
+        st.write(r)
