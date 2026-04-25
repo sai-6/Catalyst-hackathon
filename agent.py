@@ -11,15 +11,30 @@ API_KEY = st.secrets.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 def get_readme_demo_results():
-    """Deterministic Demo Data (API-Free)"""
+    """Deterministic Demo Data - Exactly as per README (API-Free)"""
     return {
         "match_percentage": 68,
         "summary": "Strong psychological foundation with excellent emotional intelligence. Needs corporate HR exposure in recruitment and stakeholder management.",
         "key_strengths": ["Emotional Intelligence", "Empathy", "Conflict Resolution", "Active Listening"],
         "detailed_results": [
-            {"skill": "Emotional Intelligence", "jd_required": 5, "current_level": 4, "gap": 1, "priority": "Low", "feedback": "High clinical empathy transferable to team dynamics.", "learning_plan": "Apply EI to corporate leadership."},
-            {"skill": "Conflict Resolution", "jd_required": 5, "current_level": 3, "gap": 2, "priority": "High", "feedback": "Clinical mediation background is a strong start.", "learning_plan": "Harvard Online: 'Negotiation Mastery'."},
-            {"skill": "Recruitment", "jd_required": 4, "current_level": 1, "gap": 3, "priority": "High", "feedback": "Limited exposure to ATS or corporate pipelines.", "learning_plan": "LinkedIn Recruiter certification."}
+            {
+                "skill": "Conflict Resolution", "jd_required": 5, "current_level": 3, "gap": 2, "priority": "High",
+                "feedback": "Clinical mediation background is a strong start for workplace mediation.",
+                "learning_plan": "Harvard Online: 'Negotiation Mastery' and role-play corporate mediation exercises.",
+                "demo_question": "How do you handle workplace mediation between two senior stakeholders?",
+                "demo_answer": "I would apply the 'Active Listening' and 'Emotional Regulation' techniques from my clinical training. By acknowledging the underlying emotions of both parties first, I can de-escalate the tension before moving toward a collaborative resolution.",
+                "demo_score": 4,
+                "demo_reason": "Excellent application of clinical de-escalation in a corporate hierarchy context."
+            },
+            {
+                "skill": "Recruitment", "jd_required": 4, "current_level": 1, "gap": 3, "priority": "High",
+                "feedback": "Limited exposure to ATS or corporate hiring pipelines.",
+                "learning_plan": "LinkedIn Recruiter certification and ATS training.",
+                "demo_question": "How would your psychology background improve our talent acquisition process?",
+                "demo_answer": "I would move beyond resume matching to behavioral interviewing, looking for 'Trait-Environment Fit' to ensure long-term retention.",
+                "demo_score": 3,
+                "demo_reason": "Strong conceptual understanding, though lacks specific experience with corporate ATS tools."
+            }
         ]
     }
 
