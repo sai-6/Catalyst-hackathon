@@ -33,19 +33,19 @@ graph TD
 
     style A fill:#e3f2fd,stroke:#1976d2
     style D fill:#f3e5f5,stroke:#7b1fa2
-🎯 Full Demo: Input → OutputInput (HR Executive Role)Job Description:PlaintextWe are hiring an HR Executive with strong expertise in:
+🎯 Full Demo: Input → Output1. Input DataJob Description (HR Executive):PlaintextWe are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
 - Employee Engagement and Retention Strategies
 - Recruitment and Talent Acquisition
 - Emotional Intelligence and Team Dynamics
-Resume:PlaintextMA in Clinical Psychology (2025). 
+Candidate Resume:PlaintextMA in Clinical Psychology (2025). 
 1 year experience as Counselor in rehabilitation setting. 
 Skilled in empathy, active listening, emotional regulation, and supporting individuals through difficult situations. 
 Limited corporate HR exposure but strong foundation in human behavior and psychology.
-Expected Output (After Clicking "Load HR Executive Demo")Executive SummaryOverall Match Percentage: 68%Overall Score: 3.1 – 3.8 / 5.0Summary: Strong psychological foundation with excellent emotional intelligence and conflict resolution skills from counseling experience. Needs corporate HR exposure in recruitment and stakeholder management.Key StrengthsExceptional emotional intelligence from clinical psychology background.Proven conflict resolution skills from counseling practice.Strong empathy and active listening abilities.📊 Skill Breakdown TableSkillRequiredCurrentGapPriorityEmotional Intelligence541LowCommunication532HighConflict Resolution532HighRecruitment413HighEmployee Engagement422Medium📚 Sample Learning PlanSkill: Recruitment (Gap: 3)Focus Areas: Corporate hiring processes and ATS management.Resources: LinkedIn Recruiter Certification.Practice Tasks: ATS training and behavioral interviewing workshops.💡 Key Features✅ Intelligent Analysis: Combined JD + Resume analysis for realistic gap detection.✅ Psychology-Informed: Prompts designed by an Organizational Psychology perspective.✅ Behavioral Assessment: Generates natural, interviewer-style questions.✅ Learning Plans: Actionable steps to bridge specific skill gaps.✅ Professional Exports: Generate PDF reports for candidates or recruiters.⚙️ Local SetupClone the repository:Bashgit clone [https://github.com/sai-6/Catalyst-hackathon.git](https://github.com/sai-6/Catalyst-hackathon.git)
+2. Analysis ResultsExecutive Summary:Match Percentage: 68%Summary: Strong psychological foundation with excellent emotional intelligence and conflict resolution skills from counseling experience. Needs corporate HR exposure in recruitment, stakeholder management, and employee engagement strategies.Key Strengths:Exceptional emotional intelligence from clinical psychology background.Proven conflict resolution skills from counseling practice.Strong empathy and active listening abilities.3. Skill Breakdown & AssessmentSkillJD RequiredCurrent LevelGapPriorityEmotional Intelligence541LowCommunication532HighConflict Resolution532HighEmployee Engagement422MediumRecruitment413HighSample Assessment Answer (Emotional Intelligence):"I have developed strong emotional intelligence through my counseling work, helping clients regulate emotions during difficult sessions."📚 Personalized Learning PlansWhen a gap is identified, the agent generates actionable steps:Conflict Resolution: Harvard online: 'Negotiation Mastery', role-play corporate mediation exercises.Recruitment: LinkedIn Recruiter certification, ATS (Applicant Tracking System) training.Communication: Toastmasters or corporate communication workshop, Practice executive presentations.💡 Key Features✅ Intelligent Analysis: Combined JD + Resume analysis for realistic gap detection.✅ Psychology-Informed: Prompts designed from an Organizational Psychology perspective.✅ Behavioral Assessment: Generates natural, interviewer-style questions for validation.✅ Weighted Scoring: Overall match % is calculated based on skill priority.✅ Professional Exports: Generate high-quality PDF reports for recruitment teams.⚙️ Local SetupClone the repository:Bashgit clone [https://github.com/sai-6/Catalyst-hackathon.git](https://github.com/sai-6/Catalyst-hackathon.git)
 cd Catalyst-hackathon
 Install dependencies:Bashpip install -r requirements.txt
-Configure Environment:Create a .env file and add your key:PlaintextGOOGLE_API_KEY=your_api_key_here
+Configure Environment:Create a .env file:PlaintextGOOGLE_API_KEY=your_api_key_here
 Run the App:Bashstreamlit run app.py
-🧠 About the AuthorArunjyoti Das MA Clinical Psychology (2025) | BA Psychology (2020) This project merges clinical insight with AI-enabled Organizational Psychology to solve modern HR challenges.
+🧠 About the AuthorArunjyoti Das MA Clinical Psychology (2025) | BA Psychology (2020) This project merges clinical insight with AI to solve modern HR challenges.
