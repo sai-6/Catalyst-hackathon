@@ -15,12 +15,20 @@ from prompts import (
 load_dotenv()
 
 # ---------------- API KEY ----------------
-if "GOOGLE_API_KEY" in st.secrets:
-    API_KEY = st.secrets["GOOGLE_API_KEY"]
-elif os.getenv("GOOGLE_API_KEY"):
+try:
+    if "GOOGLE_API_KEY" in st.secrets:
+        API_KEY = st.secrets["GOOGLE_API_KEY"]
+    else:
+        API_KEY = os.getenv("GOOGLE_API_KEY")
+except Exception:
+    # If st.secrets isn't found at all (local use), fall back to .env
     API_KEY = os.getenv("GOOGLE_API_KEY")
+
+# Initialize the client globally for this file
+if API_KEY:
+    client = genai.Client(api_key=API_KEY)
 else:
-    API_KEY = None
+    client = None
 
 def call_gemini(prompt):
     if not client:
