@@ -6,17 +6,7 @@ from report import generate_pdf
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
-# Session State
-if "jd" not in st.session_state:
-    st.session_state.jd = ""
-if "resume" not in st.session_state:
-    st.session_state.resume = ""
-if "analysis_result" not in st.session_state:
-    st.session_state.analysis_result = None
-if "user_answers" not in st.session_state:
-    st.session_state.user_answers = {}
-
-# COMPLETE DEMO DATA - ADDED ONLY
+# --- COMPLETE DEMO DATA ---
 DEMO_JD = """We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
@@ -39,46 +29,31 @@ DEMO_ANALYSIS_RESULT = {
         "Solid foundation in human behavior analysis"
     ],
     "detailed_results": [
-        {
-            "skill": "Emotional Intelligence",
-            "gap": 10,
-            "feedback": "Excellent foundation from counseling work. Can directly apply to team dynamics and leadership.",
-            "learning_plan": "1. Read 'Emotional Intelligence 2.0' by Travis Bradberry\n2. Practice EQ assessments with corporate scenarios\n3. Complete LinkedIn Learning: 'Developing Executive Presence'"
-        },
-        {
-            "skill": "Conflict Resolution",
-            "gap": 15,
-            "feedback": "Strong mediation skills from family counseling. Translate to workplace scenarios.",
-            "learning_plan": "1. Case studies: Workplace conflict scenarios\n2. Harvard online: 'Negotiation Mastery'\n3. Role-play corporate mediation exercises"
-        },
-        {
-            "skill": "Communication",
-            "gap": 25,
-            "feedback": "Empathetic communication strong. Needs corporate stakeholder communication practice.",
-            "learning_plan": "1. Toastmasters or corporate communication workshop\n2. Practice executive presentations\n3. LinkedIn Learning: 'Strategic Communication'"
-        },
-        {
-            "skill": "Employee Engagement",
-            "gap": 45,
-            "feedback": "Psychology knowledge applicable but lacks corporate retention strategy experience.",
-            "learning_plan": "1. Gallup employee engagement courses\n2. Study retention benchmarking data\n3. Analyze company turnover case studies"
-        },
-        {
-            "skill": "Recruitment",
-            "gap": 60,
-            "feedback": "No corporate recruitment experience. Strong assessment skills can be leveraged.",
-            "learning_plan": "1. LinkedIn Recruiter certification\n2. ATS (Applicant Tracking System) training\n3. Behavioral interviewing workshops"
-        }
+        {"skill": "Emotional Intelligence", "gap": 10, "feedback": "Excellent foundation.", "learning_plan": "1. Read 'Emotional Intelligence 2.0'"},
+        {"skill": "Conflict Resolution", "gap": 15, "feedback": "Strong mediation skills.", "learning_plan": "1. Harvard 'Negotiation Mastery'"},
+        {"skill": "Communication", "gap": 25, "feedback": "Needs corporate practice.", "learning_plan": "1. Toastmasters workshop"},
+        {"skill": "Employee Engagement", "gap": 45, "feedback": "Lacks retention strategy.", "learning_plan": "1. Gallup courses"},
+        {"skill": "Recruitment", "gap": 60, "feedback": "No corporate hiring experience.", "learning_plan": "1. LinkedIn Recruiter cert"}
     ]
 }
 
 DEMO_USER_ANSWERS = {
-    "Emotional Intelligence": "I have developed strong emotional intelligence through my counseling work, helping clients regulate emotions during difficult sessions.",
-    "Conflict Resolution": "In counseling, I mediated emotional conflicts between family members and clients effectively.",
-    "Communication": "I communicate clearly and empathetically with clients from diverse backgrounds in therapy sessions.",
-    "Employee Engagement": "While my experience is clinical, I understand motivation theories and can apply them to retention strategies.",
-    "Recruitment": "Limited experience but skilled in psychological assessment. Eager to learn corporate hiring processes."
+    "Emotional Intelligence": "I have developed strong emotional intelligence through my counseling work...",
+    "Conflict Resolution": "In counseling, I mediated emotional conflicts between family members...",
+    "Communication": "I communicate clearly and empathetically with clients in therapy...",
+    "Employee Engagement": "I understand motivation theories and can apply them to retention...",
+    "Recruitment": "Limited experience but skilled in psychological assessment."
 }
+
+# --- SESSION STATE INITIALIZATION ---
+if "jd_input" not in st.session_state:
+    st.session_state.jd_input = ""
+if "resume_input" not in st.session_state:
+    st.session_state.resume_input = ""
+if "analysis_result" not in st.session_state:
+    st.session_state.analysis_result = None
+if "user_answers" not in st.session_state:
+    st.session_state.user_answers = {}
 
 # API Check
 API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
@@ -86,38 +61,36 @@ if not API_KEY:
     st.error("❌ GOOGLE_API_KEY not configured.")
     st.stop()
 
-# Sidebar - ORIGINAL EXACTLY
+# --- SIDEBAR ---
 with st.sidebar:
     st.header("🧠 SkillBridge AI")
     st.caption("Psychology-powered Skill Gap Analysis")
 
     if st.button("🆕 New Assessment", use_container_width=True):
-        # FIXED - Selective clear only
-        st.session_state.jd = ""
-        st.session_state.resume = ""
+        st.session_state.jd_input = ""
+        st.session_state.resume_input = ""
         st.session_state.analysis_result = None
         st.session_state.user_answers = {}
         st.rerun()
 
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
-        st.session_state.jd = DEMO_JD
-        st.session_state.resume = DEMO_RESUME
+        # Update session state keys directly to force widget update
+        st.session_state.jd_input = DEMO_JD
+        st.session_state.resume_input = DEMO_RESUME
         st.session_state.analysis_result = DEMO_ANALYSIS_RESULT
         st.session_state.user_answers = DEMO_USER_ANSWERS
         st.rerun()
 
-# Main UI - ORIGINAL + AUTO-FILL FIX
+# --- MAIN UI ---
 st.title("🧠 SkillBridge AI")
 st.markdown("**AI-Powered Skill Assessment • Gap Analysis • Personalized Learning Plans**")
 
 col1, col2 = st.columns(2)
 with col1:
-    jd = st.text_area("📄 Job Description", value=st.session_state.jd, height=220, key="jd_input")
+    # Use key directly to link to session state
+    jd = st.text_area("📄 Job Description", height=220, key="jd_input")
 with col2:
-    resume = st.text_area("📝 Resume", value=st.session_state.resume, height=220, key="resume_input")
-
-st.session_state.jd = jd
-st.session_state.resume = resume
+    resume = st.text_area("📝 Resume", height=220, key="resume_input")
 
 if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=True):
     if not jd.strip() or not resume.strip():
@@ -129,7 +102,7 @@ if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=Tru
             st.success("✅ Analysis Complete!")
             st.rerun()
 
-# Show Results - ORIGINAL EXACTLY
+# --- SHOW RESULTS ---
 if st.session_state.analysis_result:
     result = st.session_state.analysis_result
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Executive Summary", "🔍 Skill Breakdown", "❓ Assessment", "📚 Learning Plans"])
@@ -144,7 +117,7 @@ if st.session_state.analysis_result:
 
     with tab2:
         for item in result.get("detailed_results", []):
-            with st.expander(f"{item.get('skill', '')} - Gap: {item.get('gap', 0)}"):
+            with st.expander(f"{item.get('skill', '')} - Gap: {item.get('gap', 0)}%"):
                 st.write(f"**Feedback:** {item.get('feedback', '')}")
 
     with tab3:
@@ -152,18 +125,18 @@ if st.session_state.analysis_result:
         for item in result.get("detailed_results", []):
             skill = item.get("skill", "")
             st.subheader(skill)
-            st.write(generate_questions(skill))
-            st.text_area("Sample Answer (pre-filled)", 
-                        value=st.session_state.user_answers.get(skill, ""), 
-                        disabled=True, height=80)
+            # Display question from agent
+            st.info(generate_questions(skill))
+            # Pre-fill answer area based on demo data or user input
+            ans_val = st.session_state.user_answers.get(skill, "")
+            st.text_area(f"Your Response ({skill})", value=ans_val, height=100, key=f"ans_{skill}")
 
     with tab4:
         for item in result.get("detailed_results", []):
             if item.get("gap", 0) > 0:
-                with st.expander(f"Learning Plan: {item.get('skill', '')}"):
+                with st.expander(f"📚 Learning Plan: {item.get('skill', '')}"):
                     st.markdown(item.get("learning_plan", ""))
 
-    # Export - ORIGINAL
     st.divider()
     col1, col2 = st.columns(2)
     with col1:
