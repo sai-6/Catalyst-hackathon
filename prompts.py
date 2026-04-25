@@ -1,7 +1,7 @@
 def comprehensive_analysis_prompt(jd: str, resume: str) -> str:
-    """Main powerful prompt - Analyzes JD + Resume together with Organizational Psychology lens"""
+    """Main analysis prompt - JD + Resume combined"""
     return f"""
-You are an expert **Organizational Psychologist** and Senior HR Talent Analyst with 15+ years of experience in psychological assessment and talent development.
+You are an expert Organizational Psychologist and Senior HR Talent Analyst with 15+ years experience.
 
 **Job Description:**
 {jd}
@@ -9,45 +9,54 @@ You are an expert **Organizational Psychologist** and Senior HR Talent Analyst w
 **Candidate Resume:**
 {resume}
 
-Perform a thorough, honest, and realistic skill gap analysis from an Organizational Psychology perspective.
+Perform a deep, honest skill gap analysis from an Organizational Psychology perspective.
 
-### Tasks:
-1. Identify all relevant skills required by the JD and demonstrated in the resume.
-2. For each key skill, provide:
-   - **JD Required Level** (1-5): How critical this skill is for success in the role.
-   - **Resume Demonstrated Level** (0-5): How strongly the candidate shows evidence of this skill.
-   - **Match Score** (0-5)
-   - **Gap Description**: Clear explanation of the gap.
-   - **Priority**: High, Medium, or Low
-   - **Rationale**: Short explanation, especially noting transferability of clinical psychology/counseling skills to corporate HR contexts.
+For each relevant skill, provide:
+- JD Required Level (1-5)
+- Resume Demonstrated Level (0-5)
+- Match Score (0-5)
+- Gap Description
+- Priority (High / Medium / Low)
+- Rationale (especially transferability of counseling/psychology skills to corporate HR)
 
-3. Provide:
-   - **Overall Match Percentage** (realistic 0-100)
-   - **Key Strengths** (list 3-5, highlight transferable soft skills like EI, empathy, etc.)
-   - **Critical Gaps** (list the most important ones)
-   - **Summary**: One well-written paragraph summarizing the candidate's fit and development needs.
+Also include:
+- Overall Match Percentage (realistic 0-100)
+- Key Strengths (3-5 points, highlight soft skills like EI and empathy)
+- Critical Gaps
+- One-paragraph summary
 
-Be constructive, specific, and realistic. Psychology graduates often excel in empathy and emotional intelligence but may lack corporate HR processes — reflect this fairly.
+Be realistic and constructive. Psychology graduates often excel in empathy and emotional intelligence but may lack corporate HR processes.
 
-Return **ONLY** valid JSON. No additional text.
+Return **ONLY** valid JSON. No extra text.
 """
+
 
 def question_generation_prompt(skill: str) -> str:
-    """Generates high-quality behavioral questions"""
+    """Conversational, natural interviewer-style questions"""
     return f"""
-As an Organizational Psychologist, generate **3 strong behavioral interview questions** for assessing the skill: **{skill}**.
+You are an experienced, warm, and professional HR interviewer conducting a behavioral interview.
+
+Generate **3 natural and conversational behavioral questions** to assess the candidate's proficiency in: **{skill}**.
+
+Make the questions sound like a real human interviewer would ask — friendly, engaging, and open-ended. 
+Use natural language, not robotic or overly formal.
 
 Focus on:
-- Real workplace scenarios
-- Past behavior (STAR method friendly)
-- Transferability from counseling/psychology background where relevant
-- Emotional intelligence and self-awareness
+- Past real-life experiences
+- Transferable skills from psychology or counseling background where relevant
+- Self-awareness and behavioral examples
 
-Return only the 3 numbered questions. No extra explanation.
+Return **only** the 3 numbered questions. Do not add any extra text or explanations.
+
+Example tone:
+"Tell me about a time when..."
+"Can you walk me through how you handled..."
+"How have you used your skills in ...?"
 """
 
+
 def evaluation_prompt(skill: str, answer: str) -> str:
-    """Strict evaluator with psychology background"""
+    """Strict but fair evaluator"""
     return f"""
 You are a strict but fair evaluator with background in Clinical and Organizational Psychology.
 
@@ -58,67 +67,41 @@ Candidate's Answer:
 
 Evaluate **only** what is written. Do not assume missing information.
 
-**Scoring Rubric (1-5):**
+Scoring Rubric (1-5):
 1 = No meaningful understanding or irrelevant
 2 = Basic awareness, very vague or generic
 3 = Moderate understanding, some ideas but lacks depth/examples
 4 = Strong understanding with clear relevant examples or reasoning
-5 = Expert-level insight, excellent examples, strong self-awareness or psychological framing
+5 = Expert-level insight, excellent examples, strong self-awareness
 
 Rules:
 - Penalize vague or generic answers heavily.
-- Give credit for concrete examples and reflection on human behavior.
-- Be honest and developmental in your feedback.
+- Give bonus for concrete examples and psychological insight.
+- Be honest and developmental in feedback.
 
-Return **ONLY** this exact JSON format:
+Return **ONLY** this JSON:
 {{
-  "score": <integer between 1 and 5>,
+  "score": <integer 1-5>,
   "reason": "<short constructive explanation (1-2 sentences)>"
 }}
 """
 
+
 def learning_plan_prompt(skill: str, gap: int) -> str:
-    """Practical learning plan tailored for psychology background"""
+    """Practical learning plan"""
     return f"""
-Create a concise, actionable, and encouraging **personalized learning plan** to close the gap in: **{skill}** (Current Gap Level: {gap}/5).
+Create a concise, actionable, and encouraging personalized learning plan to close the gap in: **{skill}** (Gap Level: {gap}/5).
 
-Target audience: A Clinical Psychology graduate transitioning into HR/Organizational roles.
+Target audience: Clinical Psychology graduate transitioning into HR roles.
 
-Include these sections:
-- **Key Focus Areas** (what specifically needs improvement)
-- **Recommended Resources** (free or low-cost: Coursera, YouTube, articles, books, tools)
-- **Practice Tasks** (2-3 specific, practical exercises — include reflection or behavioral practice)
-- **Time Estimate** (realistic number of weeks)
-- **Progress Milestones** (how to measure improvement)
+Include:
+- Key Focus Areas
+- Recommended Resources (free or low-cost)
+- Practice Tasks (2-3 specific exercises)
+- Realistic Time Estimate
+- Progress Milestones
 
-Emphasize how to apply psychological knowledge (emotional intelligence, behavioral insights, empathy) in a corporate HR context.
+Emphasize applying psychological knowledge (emotional intelligence, behavioral insights, empathy) in corporate HR context.
 
-Use clear bullet points and keep the tone supportive and practical.
+Use clear bullet points and keep the tone supportive.
 """
-
-# Optional: Schema helper (for future structured output improvements)
-def get_analysis_schema():
-    return {
-        "type": "object",
-        "properties": {
-            "skill_analysis": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "skill": {"type": "string"},
-                        "jd_required_level": {"type": "integer", "minimum": 1, "maximum": 5},
-                        "resume_level": {"type": "integer", "minimum": 0, "maximum": 5},
-                        "match_score": {"type": "integer", "minimum": 0, "maximum": 5},
-                        "gap_description": {"type": "string"},
-                        "priority": {"type": "string", "enum": ["High", "Medium", "Low"]},
-                        "rationale": {"type": "string"}
-                    }
-                }
-            },
-            "overall_match_percentage": {"type": "number"},
-            "key_strengths": {"type": "array", "items": {"type": "string"}},
-            "critical_gaps": {"type": "array", "items": {"type": "string"}},
-            "summary": {"type": "string"}
-        }
-    }

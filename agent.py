@@ -58,6 +58,7 @@ def analyze_jd_resume(jd_text: str, resume_text: str):
     })
 
 def generate_questions(skill):
+    """Updated to feel more conversational and interviewer-like"""
     return call_gemini(question_generation_prompt(skill))
 
 def evaluate_answer(skill, answer):
