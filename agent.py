@@ -2,43 +2,34 @@ import os, json, streamlit as st
 from google import genai
 from prompts import comprehensive_analysis_prompt, learning_plan_prompt
 
-# API Config
+# Security: Pull API Key from Streamlit Secrets
 API_KEY = st.secrets.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
-def get_demo_results():
-    """Returns the hardcoded psychology assessment results (Works without API)"""
+def get_readme_demo_results():
+    """Returns the deterministic demo results from the README file"""
     return {
         "match_percentage": 68,
-        "summary": "The candidate shows a strong psychological foundation with excellent emotional intelligence. There is a clear gap in corporate HR administrative processes, but their background in counseling makes them a high-potential mediator.",
-        "key_strengths": ["Advanced Empathy", "Emotional Regulation", "Active Listening", "Behavioral Analysis"],
+        "summary": "Strong psychological foundation with excellent emotional intelligence. Needs corporate HR exposure in recruitment and stakeholder management.",
+        "key_strengths": ["Emotional Intelligence", "Empathy", "Conflict Resolution", "Active Listening"],
         "detailed_results": [
-            {
-                "skill": "Emotional Intelligence", "jd_required": 5, "current_level": 4, "gap": 1, "priority": "Low",
-                "feedback": "Deep clinical understanding of human emotions allows for high-level team management.",
-                "learning_plan": "Focus on applying EI to corporate leadership rather than clinical counseling."
-            },
-            {
-                "skill": "Conflict Resolution", "jd_required": 5, "current_level": 3, "gap": 2, "priority": "High",
-                "feedback": "Strong mediation skills in a clinical setting need to transition to corporate workplace disputes.",
-                "learning_plan": "Take Harvard online: 'Negotiation Mastery' and practice role-play mediation."
-            },
-            {
-                "skill": "Recruitment & Talent Acquisition", "jd_required": 4, "current_level": 1, "gap": 3, "priority": "High",
-                "feedback": "Limited experience with ATS or corporate hiring pipelines.",
-                "learning_plan": "Obtain LinkedIn Recruiter certification and learn Applicant Tracking Systems."
-            }
+            {"skill": "Emotional Intelligence", "jd_required": 5, "current_level": 4, "gap": 1, "priority": "Low", "feedback": "High clinical empathy transferable to team dynamics.", "learning_plan": "Apply EI to corporate leadership."},
+            {"skill": "Communication", "jd_required": 5, "current_level": 3, "gap": 2, "priority": "High", "feedback": "Counseling communication is strong; needs stakeholder management focus.", "learning_plan": "Practice corporate presentation styles."},
+            {"skill": "Conflict Resolution", "jd_required": 5, "current_level": 3, "gap": 2, "priority": "High", "feedback": "Clinical mediation background is a strong start.", "learning_plan": "Harvard online: 'Negotiation Mastery'."},
+            {"skill": "Employee Engagement", "jd_required": 4, "current_level": 2, "gap": 2, "priority": "Medium", "feedback": "Understands human motivation but lacks corporate strategy.", "learning_plan": "Study corporate retention models."},
+            {"skill": "Recruitment", "jd_required": 4, "current_level": 1, "gap": 3, "priority": "High", "feedback": "Limited exposure to ATS or corporate pipelines.", "learning_plan": "LinkedIn Recruiter certification, ATS training."}
         ]
     }
 
 def run_assessment(jd, resume):
-    """The Real-Time Engine (Uses Gemini API)"""
-    if not client: return {"summary": "API Key Missing in Secrets", "detailed_results": []}
+    """The Live Analysis Engine using Gemini API"""
+    if not client: return {"summary": "API Key Missing", "detailed_results": []}
     
     prompt = comprehensive_analysis_prompt(jd, resume)
     try:
         response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-        data = json.loads(response.text[response.text.find('{'):response.text.rfind('}')+1])
+        text = response.text
+        data = json.loads(text[text.find('{'):text.rfind('}')+1])
         
         results = []
         for s in data.get("skill_analysis", []):
@@ -58,8 +49,8 @@ def run_assessment(jd, resume):
             "key_strengths": data.get("key_strengths", []),
             "detailed_results": results
         }
-    except:
-        return {"summary": "Error calling API.", "detailed_results": []}
+    except Exception as e:
+        return {"summary": f"Analysis failed: {e}", "detailed_results": []}
 
 def generate_questions(skill):
-    return f"Can you describe a situation where your psychological background helped you resolve a challenge in {skill}?"
+    return f"Tell me about a time you applied your clinical skills to a situation involving {skill}?"
