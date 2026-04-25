@@ -61,6 +61,17 @@ Limited corporate HR exposure but strong foundation in human behavior.
 
 ---
 
-### 📚 Personalized Learning Plans
+## 📚 Personalized Learning Plans
+
 * **Conflict Resolution:** Harvard online: 'Negotiation Mastery', role-play corporate mediation exercises.
-* **Recruitment:** LinkedIn Recruiter certification, ATS (Applicant Tracking System) training.🧠 About the AuthorArunjyoti Das | MA Clinical Psychology (2025).This project merges clinical insight with AI to solve modern HR challenges.
+* **Recruitment:** LinkedIn Recruiter certification, ATS (Applicant Tracking System) training.
+
+---
+
+## 🧠 About the Author
+
+**Arunjyoti Das** *MA Clinical Psychology (2025) | BA Psychology (2020)* This project merges clinical insight with AI to solve modern HR challenges. It was built for the **Deccan AI Catalyst Hackathon** to turn psychological insights into practical talent development solutions.
+
+---
+
+*Made with ❤️ by Arunjyoti Das*
