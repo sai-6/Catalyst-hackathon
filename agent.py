@@ -2,15 +2,13 @@ import os, json, streamlit as st
 from google import genai
 from prompts import comprehensive_analysis_prompt, learning_plan_prompt
 
-# SECURE API SETUP
 API_KEY = st.secrets.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 def run_assessment(jd, resume):
-    """Core Agent Layer using Organizational Psychologist Persona and Gaps Engine"""
     if not client: return {"summary": "API Key Missing", "detailed_results": []}
 
-    # RESTORED: Using YOUR exact prompt engine from prompts.py
+    # Restoring YOUR exact analysis engine
     prompt = comprehensive_analysis_prompt(jd, resume)
 
     try:
@@ -20,17 +18,16 @@ def run_assessment(jd, resume):
 
         results = []
         for s in data.get("skill_analysis", []):
-            # THE GAP ENGINE LOGIC (JD Required - Resume Demonstrated)
-            gap_val = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
+            gap = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
             
-            # THE LEARNING ENGINE LOGIC (From prompts.py)
-            plan = learning_plan_prompt(s.get("skill"), gap_val)
+            # Using YOUR learning plan engine from prompts.py
+            plan = learning_plan_prompt(s.get("skill"), gap)
             
             results.append({
                 "skill": s.get("skill"),
                 "jd_required": s.get("jd_required_level"),
                 "current_level": s.get("resume_demonstrated_level"),
-                "gap": gap_val,
+                "gap": gap,
                 "priority": s.get("priority"),
                 "feedback": s.get("rationale"),
                 "learning_plan": plan
@@ -43,8 +40,7 @@ def run_assessment(jd, resume):
             "detailed_results": results
         }
     except Exception as e:
-        return {"summary": f"Analysis Error: {e}", "detailed_results": []}
+        return {"summary": f"Engine Error: {e}", "detailed_results": []}
 
 def generate_questions(skill):
-    """Generates behavioral questions as per your original architecture"""
-    return f"How do you apply your clinical psychology empathy to manage {skill} in a corporate environment?"
+    return f"As a clinical psychology graduate, how would you leverage your empathy to manage {skill} in a corporate environment?"
