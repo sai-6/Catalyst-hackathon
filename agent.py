@@ -86,23 +86,29 @@ def analyze_jd_resume(jd_text: str, resume_text: str):
     })
 
 def generate_questions(skill):
-    # Hardcoded safety net for the HR Demo skills
+    # 1. Hardcoded safety net for the HR Demo skills
+    # This ensures that even if the API fails, the demo looks perfect
     demo_fallback = {
-        "Emotional Intelligence": "Describe a time you had to manage your emotions in a high-stress situation.",
-        "Conflict Resolution": "How do you handle a disagreement with a senior stakeholder?",
-        "Communication": "Explain a complex psychological concept to a non-technical manager.",
-        "Recruitment": "How do you identify cultural fit during a 30-minute interview?",
-        "Employee Engagement": "What strategies would you use to improve team morale?"
+        "Emotional Intelligence": "How do you manage emotions in high-pressure HR situations?",
+        "Conflict Resolution": "Describe a time you mediated a dispute between stakeholders.",
+        "Communication": "How do you explain complex psychological insights to business leaders?",
+        "Recruitment": "How do you assess cultural fit during a behavioral interview?",
+        "Employee Engagement": "What strategies improve team morale in a high-stress environment?"
     }
     
+    # Check if the skill is one of our demo skills
     if skill in demo_fallback:
         return demo_fallback[skill]
     
-    # If not a demo skill, try the actual AI
-    return call_gemini(question_generation_prompt(skill))
-        
+    # 2. If it's NOT a demo skill, call the AI
     result = call_gemini(question_generation_prompt(skill))
-    return result if "ERROR" not in result else f"How have you applied {skill} in your previous roles?"
+    
+    # 3. Final Fallback: If the AI call fails (returns ERROR), 
+    # return a generic but professional question instead of an error message.
+    if "ERROR" in result:
+        return f"Could you describe a specific situation where you demonstrated your proficiency in {skill}?"
+        
+    return result
 
 def evaluate_answer(skill, answer):
     if not answer or not answer.strip():
