@@ -45,10 +45,19 @@ def call_gemini(prompt):
     return "ERROR: All models failed"
 
 def safe_json_parse(text, fallback=None):
-    """Robust JSON parser that handles Markdown code blocks"""
-    if fallback is None:
-        fallback = {}
-    if "ERROR" in text:
+    if fallback is None: fallback = {}
+    if not text or "ERROR" in text: return fallback
+    
+    try:
+        # Improved extraction logic for any text between curly braces
+        start = text.find('{')
+        end = text.rfind('}') + 1
+        if start != -1 and end != 0:
+            json_str = text[start:end]
+            return json.loads(json_str)
+        return json.loads(text.strip())
+    except Exception as e:
+        print(f"JSON Parse Error: {e}")
         return fallback
         
     try:
