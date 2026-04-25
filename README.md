@@ -35,16 +35,20 @@ graph TD
     style D fill:#f3e5f5,stroke:#7b1fa2,color:#000,stroke-width:2px
 ```
 
-🎯 Full Demo: Input → Output1. Input DataJob Description (HR Executive):PlaintextWe are hiring an HR Executive with strong expertise in:
+🎯 Full Demo: Input → Output
+1. Input Data
+Job Description (HR Executive):
+We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
 - Employee Engagement and Retention Strategies
 - Recruitment and Talent Acquisition
 - Emotional Intelligence and Team Dynamics
-Candidate Resume:PlaintextMA in Clinical Psychology (2025). 
-1 year experience as Counselor in rehabilitation setting. 
-Skilled in empathy, active listening, emotional regulation.
+Candidate Resume:
+MA in Clinical Psychology (2025). 1 year experience as Counselor. 
+Skilled in empathy, active listening, and emotional regulation.
 Limited corporate HR exposure but strong foundation in human behavior.
+
 ### 2. Analysis Results
 
 **Executive Summary:**
