@@ -103,25 +103,28 @@ with st.sidebar:
         st.success("✅ Demo Loaded with Complete Analysis!")
         st.rerun()
 
-# Main UI
+# Main UI - FIXED INPUTS
 st.title("🧠 SkillBridge AI")
 st.markdown("**AI-Powered Skill Assessment • Gap Analysis • Personalized Learning Plans**")
 
 col1, col2 = st.columns(2)
 with col1:
-    jd = st.text_area("📄 Job Description", value=st.session_state.jd, height=220, key="jd_input")
+    st.session_state.jd = st.text_area("📄 Job Description", 
+                                     value=st.session_state.jd, 
+                                     height=220,
+                                     key="jd_input_fixed")
 with col2:
-    resume = st.text_area("📝 Resume", value=st.session_state.resume, height=220, key="resume_input")
-
-st.session_state.jd = jd
-st.session_state.resume = resume
+    st.session_state.resume = st.text_area("📝 Resume", 
+                                         value=st.session_state.resume, 
+                                         height=220,
+                                         key="resume_input_fixed")
 
 if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=True):
-    if not jd.strip() or not resume.strip():
+    if not st.session_state.jd.strip() or not st.session_state.resume.strip():
         st.error("Please provide both JD and Resume.")
     else:
         with st.spinner("Analyzing..."):
-            result = run_assessment(jd, resume, {})
+            result = run_assessment(st.session_state.jd, st.session_state.resume, {})
             st.session_state.analysis_result = result
             st.success("✅ Analysis Complete!")
             st.rerun()
