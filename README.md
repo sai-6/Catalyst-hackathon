@@ -1,579 +1,193 @@
-\# 🧠 SkillBridge AI
+# 🧠 SkillBridge AI
 
-\### AI-Powered Skill Assessment \& Personalized Learning Agent
+**AI-Powered Skill Assessment & Personalized Learning Agent**  
+*Bridging Clinical Psychology into HR & Organizational Development*
 
+---
 
+## 🚀 Live Demo
+**[Open SkillBridge AI](https://catalyst-hackathon-38leseklrwbr9xfnesneo6.streamlit.app/)**
 
-\---
+> **Best Experience**: Click **"🎯 Load HR Executive Demo"** for the best demonstration.
 
+---
 
+## 📋 Problem Statement
 
-\## 🚀 Problem Statement
+A resume shows **what** a candidate claims to know.  
+SkillBridge AI reveals **how well** they actually know it and provides a clear, actionable path to close the gaps.
 
+It intelligently analyzes **Job Description + Resume**, generates behavioral questions, scores responses, and creates personalized learning plans — grounded in Organizational Psychology principles.
 
+---
 
-A resume shows what a candidate \*claims\* to know — not how well they actually know it.
+## 🏗️ Architecture
 
+```mermaid
+graph TD
+    A[Streamlit UI<br>Tabbed Interface] 
+    --> B[Core Agent Layer<br>Python Orchestration]
 
+    B --> C[Intelligent Analysis Engine<br>JD + Resume Combined Analysis]
+    C --> D[Gemini 2.0 Flash-Lite<br>with Fallback]
 
-\*\*SkillBridge AI\*\* bridges this gap by:
+    B --> E[Evaluation Engine<br>Strict 1-5 Scoring]
+    B --> F[Learning Plan Engine<br>Personalized Plans]
 
-\- Assessing real skill proficiency
+    E & F --> G[Gap Analysis & Weighted Scoring]
 
-\- Identifying gaps
+    G --> H[Structured Output Layer]
+    H --> I[PDF Report + JSON Export]
 
-\- Generating personalized learning plans
+    style A fill:#e3f2fd
+    style D fill:#f3e5f5
+Key Improvement: Instead of processing skills one-by-one, the agent performs a single deep analysis of JD + Resume using an Organizational Psychology lens for better accuracy and coherence.
 
+💡 Key Features
 
+✅ Combined JD + Resume intelligent analysis
+✅ Organizational Psychology-informed prompts and evaluation
+✅ Multi-skill gap analysis with priority (High/Medium/Low)
+✅ Behavioral interview questions + re-evaluation support
+✅ Weighted overall match percentage + confidence score
+✅ Personalized learning plans for psychology-to-HR transition
+✅ Clean tabbed professional UI
+✅ Professional PDF & JSON report export
+✅ Retry logic + model fallback for reliability
 
-\---
 
+🎯 Demo Inputs & Expected Outputs
+Demo Inputs (HR Executive Role)
+Job Description:
+textWe are hiring an HR Executive with strong expertise in:
+- Communication and Stakeholder Management
+- Conflict Resolution and Mediation
+- Employee Engagement and Retention Strategies
+- Recruitment and Talent Acquisition
+- Emotional Intelligence and Team Dynamics
+Resume:
+textMA in Clinical Psychology (2025). 
+1 year experience as Counselor in rehabilitation setting. 
+Skilled in empathy, active listening, emotional regulation, and supporting individuals through difficult situations. 
+Limited corporate HR exposure but strong foundation in human behavior and psychology.
+Expected Output
+Executive Summary
 
+Overall Match: 62–75%
+Overall Score: 3.1 – 3.8 / 5.0
+Confidence: 65–78%
 
-\## 🏗️ Architecture Overview
+Key Strengths
 
+Emotional Intelligence
+Empathy & Active Listening
+Conflict Handling (transferable from counseling)
 
+Critical Gaps
 
-&#x20;              ┌──────────────────────────┐
+Corporate Recruitment Processes
+Employee Engagement Strategies
+Stakeholder Management in business context
 
-&#x20;              │       Streamlit UI       │
+Skill Breakdown Example:
 
-&#x20;              │ (Input + Display Layer)  │
 
-&#x20;              └────────────┬─────────────┘
 
-&#x20;                           │
 
-&#x20;                           ▼
 
-&#x20;              ┌──────────────────────────┐
 
-&#x20;              │      Agent Layer         │
 
-&#x20;              │  (Python Orchestration)  │
 
-&#x20;              └─────────────┬────────────┘
 
-&#x20;                            │
 
-&#x20;     ┌───────────────────────┼────────────────────────┐
 
-&#x20;     ▼                       ▼                         ▼
 
-           ┌──────────────┐ ┌──────────────────┐ ┌──────────────────┐
 
-           │ Skill Engine │ │ Evaluation Engine│ │ Learning Engine  │
 
-           │ - Extract    │ │ - Score (1–5)    │ │ - Plans          │
 
-           │ - Clean      │ │ - Strict Rules   │ │ - Resources      │
 
-           └──────┬───────┘ └────────┬─────────┘ └────────┬─────────┘
 
-&#x20;            │                  │                    │
 
-&#x20;            └────────────┬────────────┴────────────┬───────┘
 
-&#x20;                         ▼                         ▼
 
-                   ┌────────────────────┐ ┌────────────────────┐
 
-                   │ Gap Analysis Engine│ │ Confidence Engine  │
 
-                   │ Required vs Actual │ │ Score Fusion       │
 
-                   └────────┬───────────┘ └────────┬───────────┘
 
-&#x20;                      ▼                      ▼
 
-&#x20;                  ┌──────────────────────────────────┐
-            
-&#x20;                  │ Gemini API (LLM Layer)           │
 
-&#x20;                  └──────────────────────────────────┘
 
-&#x20;                                  ▼
 
-&#x20;                     ┌──────────────────────────┐
-              
-&#x20;                     │ Output Layer             │
 
-&#x20;                     │ - Scores                 │
 
-&#x20;                     │ - Hiring Decision        │
 
-&#x20;                     │ - Learning Plan          │
 
-&#x20;                     │ - Confidence Score       │
 
-&#x20;                     └──────────────────────────┘
 
 
 
-\---
 
 
 
-\## 📊 Scoring Logic
 
 
 
-\### 🎯 1. Skill Score
 
-\- Range: \*\*1–5\*\*
 
-\- Generated by LLM
 
-\- Strict evaluation (no guessing)
 
-\- Based ONLY on provided answer
 
+SkillRequiredCurrentGapPriorityEmotional Intelligence541LowCommunication532HighConflict Resolution532HighRecruitment413HighEmployee Engagement422Medium
+Learning Plans include practical resources, role-play tasks, and realistic time estimates.
 
+📊 Scoring Logic
 
-\---
+Skill Score: 1–5 (strict evaluation based only on provided answer)
+Required Level: 1–5 (based on job importance)
+Gap: max(required - score, 0)
+Overall Score: Weighted average = Σ(score × required) / Σ(required)
+Match Percentage: Overall performance indicator
+Confidence: (overall_score / 5) × 100
 
 
-
-\### 🎯 2. Required Skill Level
-
-\- Derived from job role importance
-
-\- Range: \*\*1–5\*\*
-
-\- Used as weight in scoring
-
-
-
-\---
-
-
-
-\### 🎯 3. Gap Calculation
-
-
-
-
-
-gap = max(required - score, 0)
-
-
-
-
-
-\---
-
-
-
-\### 🎯 4. Weighted Overall Score
-
-
-
-
-
-overall\_score = Σ(score × required) / Σ(required)
-
-
-
-
-
-\---
-
-
-
-\### 🎯 5. Confidence Score
-
-
-
-
-
-confidence = (overall\_score / 5) × 100
-
-
-
-
-
-\---
-
-
-
-\### 🎯 6. Hiring Decision
-
-
-
-| Score Range | Decision           |
-
-|------------|------------------|
-
-| ≥ 4        | ✅ Strong Fit     |
-
-| 3 – 4      | ⚠️ Trainable      |
-
-| < 3        | ❌ Not Ready      |
-
-
-
-\---
-
-
-
-\## 🎯 Demo Walkthrough
-
-
-
-\### Step 1: Load Demo Scenario
-
-
-
-Click \*\*“🎯 Load Demo Scenario”\*\*
-
-
-
-This auto-loads:
-
-\- Job Description
-
-\- Resume
-
-\- Skills
-
-\- Candidate Answers
-
-
-
-\---
-
-
-
-\### 🔹 Job Description
-
-
-
-HR Executive role requiring:
-
-\- Communication
-
-\- Conflict Resolution
-
-\- Emotional Intelligence
-
-\- Recruitment
-
-\- Employee Engagement
-
-
-
-\---
-
-
-
-\### 🔹 Resume
-
-
-
-\- MA Clinical Psychology
-
-\- 1 year counseling experience
-
-\- Strong empathy \& listening
-
-\- No corporate HR exposure
-
-
-
-\---
-
-
-
-\### 🔹 Candidate Answers
-
-
-
-\*\*Communication\*\*
-
-> Therapy-based communication, no workplace exposure
-
-
-
-\*\*Conflict Resolution\*\*
-
-> Emotional conflict handling, not corporate disputes
-
-
-
-\*\*Emotional Intelligence\*\*
-
-> Strong counseling-based understanding
-
-
-
-\*\*Recruitment\*\*
-
-> No experience
-
-
-
-\*\*Employee Engagement\*\*
-
-> Basic awareness
-
-
-
-\---
-
-
-
-\### Step 2: Run Assessment
-
-
-
-Click \*\*“Run Assessment”\*\*
-
-
-
-\---
-
-
-
-\## 📊 Sample Output
-
-
-
-\### 🧠 Overall Score
-
-\*\*3.2 / 5\*\*
-
-
-
-\### 🎯 Confidence Score
-
-\*\*64%\*\*
-
-
-
-\### 🧾 Hiring Decision
-
-⚠️ \*\*Trainable Candidate\*\*
-
-
-
-\---
-
-
-
-\### 🔍 Skill-Level Results
-
-
-
-| Skill                  | Score | Required | Gap |
-
-|-----------------------|------|----------|-----|
-
-| Communication         | 3    | 5        | 2   |
-
-| Conflict Resolution   | 2    | 5        | 3   |
-
-| Emotional Intelligence| 4    | 4        | 0   |
-
-| Recruitment           | 1    | 5        | 4   |
-
-| Employee Engagement   | 2    | 4        | 2   |
-
-
-
-\---
-
-
-
-\### 🚀 Learning Plan (Example)
-
-
-
-\*\*Skill: Conflict Resolution\*\*
-
-
-
-\- \*\*Resources\*\*
-
-&#x20; - Harvard Conflict Management
-
-&#x20; - Coursera Negotiation Skills
-
-
-
-\- \*\*Tasks\*\*
-
-&#x20; - Simulate workplace conflict cases
-
-&#x20; - Role-play resolution scenarios
-
-
-
-\- \*\*Time Estimate\*\*
-
-&#x20; - 2–3 weeks learning
-
-&#x20; - 3–4 weeks practice
-
-
-
-\---
-
-
-
-\## 💡 Key Features
-
-
-
-\- ✅ AI-powered skill extraction from JD  
-
-\- ✅ Conversational interview-style assessment  
-
-\- ✅ Strict scoring (no hallucination bias)  
-
-\- ✅ Weighted scoring system  
-
-\- ✅ Dynamic gap analysis  
-
-\- ✅ Personalized learning plans  
-
-\- ✅ Demo mode for consistent evaluation  
-
-
-
-\---
-
-
-
-\## ⚙️ Setup Instructions
-
-
-
-\### 1. Clone Repo
-
-
-
-
-
-git clone https://github.com/sai-6/Catalyst-hackathon.git
-
-
-
+⚙️ Local Setup
+Bashgit clone https://github.com/sai-6/Catalyst-hackathon.git
 cd Catalyst-hackathon
-
-
-
-
-
-\---
-
-
-
-\### 2. Install Dependencies
-
-
-
-
 
 pip install -r requirements.txt
 
+cp .env.example .env
+# Add your GOOGLE_API_KEY in .env
 
+streamlit run app.py
 
+🧠 About the Author
+Arunjyoti Das
 
+MA Clinical Psychology (2025)
+BA Psychology (2020)
+1 year experience as Counselor in rehabilitation setting
 
-\---
+This project represents my transition from clinical psychology into AI-enabled Organizational Psychology and HR technology. SkillBridge AI applies deep understanding of human behavior and psychological assessment to create practical talent development tools.
 
+🚀 Future Enhancements
 
+PDF Resume/JD file upload support
+Skill radar chart visualization
+Adaptive multi-turn interview simulation
+Candidate comparison dashboard
+ATS integration
 
-\### 3. Add API Key
 
+📄 Tech Stack
 
+Frontend: Streamlit
+AI: Google Gemini (gemini-2.0-flash-lite + fallback)
+Backend: Python
+PDF: ReportLab
 
-Create `.env` file:
 
+Built for Deccan AI Catalyst Hackathon
+Turning psychological insight into practical AI solutions for HR.
 
-
-
-
-GOOGLE\_API\_KEY=your\_api\_key\_here
-
-
-
-
-
-\---
-
-
-
-\### 4. Run App
-
-
-
-
-
-python -m streamlit run app.py
-
-
-
-
-
-\---
-
-
-
-\### 5. Open in Browser
-
-
-
-
-
-http://localhost:8501
-
-
-
-
-
-\---
-
-
-
-\## ⚠️ Notes
-
-
-
-\- API key is required
-
-\- `.env` file is excluded from repo for security
-
-\- Demo mode ensures consistent outputs for evaluation
-
-
-
-\---
-
-
-
-\## 🧠 Future Enhancements
-
-
-
-\- Real-time adaptive interview loop  
-
-\- Candidate comparison dashboard  
-
-\- PDF export reports  
-
-\- ATS integration  
-
-
-
-\---
-
-
-
-\## 👤 Author
-
-
-
-\*\*Arunjyoti Das\*\*  
-
-AI + Organizational Psychology  
+Made with ❤️ by Arunjyoti Das
