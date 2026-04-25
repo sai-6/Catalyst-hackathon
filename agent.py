@@ -15,15 +15,12 @@ from prompts import (
 load_dotenv()
 
 # ---------------- API KEY ----------------
-API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
-if not API_KEY:
-    # Changed to warning to allow the UI to load even if key is missing during setup
-    st.warning("⚠️ GOOGLE_API_KEY not found. Please check your environment variables.")
-
-client = genai.Client(api_key=API_KEY) if API_KEY else None
-
-# Updated to stable, specific model strings
-MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
+if "GOOGLE_API_KEY" in st.secrets:
+    API_KEY = st.secrets["GOOGLE_API_KEY"]
+elif os.getenv("GOOGLE_API_KEY"):
+    API_KEY = os.getenv("GOOGLE_API_KEY")
+else:
+    API_KEY = None
 
 def call_gemini(prompt):
     if not client:
