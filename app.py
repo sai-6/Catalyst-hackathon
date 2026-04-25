@@ -1,10 +1,11 @@
 import streamlit as st
-from agent import run_assessment, generate_questions
+import json
+from agent import run_assessment, generate_questions, get_demo_results
 from report import generate_pdf
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
-# --- DATA FROM YOUR README (THE DEMO RESPONSES) ---
+# --- DEMO DATA FROM README ---
 DEMO_JD = """We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
@@ -16,12 +17,12 @@ DEMO_RESUME = """MA in Clinical Psychology (2025). 1 year experience as Counselo
 Skilled in empathy, active listening, and emotional regulation.
 Limited corporate HR exposure but strong foundation in human behavior."""
 
-# --- SESSION STATE INITIALIZATION ---
+# --- SESSION STATE ---
 if "jd_input" not in st.session_state: st.session_state.jd_input = ""
 if "resume_input" not in st.session_state: st.session_state.resume_input = ""
 if "analysis_result" not in st.session_state: st.session_state.analysis_result = None
 
-# --- SIDEBAR CONTROLS ---
+# --- SIDEBAR ---
 with st.sidebar:
     st.header("🧠 SkillBridge AI")
     st.caption("Organizational Psychology Engine")
@@ -33,10 +34,8 @@ with st.sidebar:
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
         st.session_state.jd_input = DEMO_JD
         st.session_state.resume_input = DEMO_RESUME
-        # AUTO-RUN ENGINE:
-        with st.spinner("🧠 Running Psychology-led Analysis..."):
-            result = run_assessment(DEMO_JD, DEMO_RESUME)
-            st.session_state.analysis_result = result
+        # NO API CALL: Instantly load the hardcoded psychology assessment
+        st.session_state.analysis_result = get_demo_results()
         st.rerun()
 
 st.title("🧠 SkillBridge AI")
@@ -44,23 +43,24 @@ st.markdown("*Bridging Clinical Psychology into HR & Organizational Development*
 
 col1, col2 = st.columns(2)
 with col1:
-    jd = st.text_area("📄 Job Description", height=250, value=st.session_state.jd_input)
+    jd_box = st.text_area("📄 Job Description", height=250, value=st.session_state.jd_input)
 with col2:
-    resume = st.text_area("📝 Resume", height=250, value=st.session_state.resume_input)
+    resume_box = st.text_area("📝 Resume", height=250, value=st.session_state.resume_input)
 
-st.session_state.jd_input = jd
-st.session_state.resume_input = resume
+# Sync manual changes
+st.session_state.jd_input = jd_box
+st.session_state.resume_input = resume_box
 
-if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=True):
-    if not jd.strip() or not resume.strip():
+if st.button("🔍 Analyze Real-Time (API Required)", type="primary", use_container_width=True):
+    if not jd_box.strip() or not resume_box.strip():
         st.error("Please provide both inputs.")
     else:
-        with st.spinner("🧠 Running Intelligent Analysis Engine..."):
-            result = run_assessment(jd, resume)
+        with st.spinner("🧠 Connecting to Live Psychology Engine..."):
+            result = run_assessment(jd_box, resume_box)
             st.session_state.analysis_result = result
             st.rerun()
 
-# --- THE PSYCHOLOGY ASSESSMENT ENGINE (RESTORED) ---
+# --- THE RESULTS DISPLAY ---
 if st.session_state.analysis_result:
     res = st.session_state.analysis_result
     st.divider()
@@ -73,9 +73,9 @@ if st.session_state.analysis_result:
         pdf_path = "SkillBridge_AI_Report.pdf"
         generate_pdf(res, pdf_path)
         with open(pdf_path, "rb") as f:
-            st.download_button("📥 Download PDF Report", f, file_name=pdf_path, use_container_width=True)
+            st.download_button("📥 Download PDF Report", f, file_name=pdf_path)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Executive Summary", "🔍 Gap Analysis", "❓ Interview Prep", "📚 Learning Plans"])
+    tab1, tab2, tab3 = st.tabs(["📊 Summary", "🔍 Gap Analysis", "📚 Learning Plans"])
     
     with tab1:
         st.write(res.get("summary", ""))
@@ -84,25 +84,15 @@ if st.session_state.analysis_result:
             st.success(s)
         
     with tab2:
-        st.markdown("### Weighted Skill Gaps (1-5 Scale)")
         for item in res.get("detailed_results", []):
             with st.expander(f"**{item.get('skill')}** (Gap: {item.get('gap')})"):
-                st.write(f"**JD Level:** {item.get('jd_required')} | **Current:** {item.get('current_level')}")
-                st.write(f"**Priority:** {item.get('priority')}")
-                st.write(f"**Psychological Rationale:** {item.get('feedback')}")
+                st.write(f"**Rationale:** {item.get('feedback')}")
+                st.info(f"**Interviewer Question:** {generate_questions(item.get('skill'))}")
 
     with tab3:
-        st.info("🧠 **Psychology-style Interviewer:** Based on your gaps, prepare for these conversational behavioral questions.")
-        for item in res.get("detailed_results", []):
-            st.subheader(f"Topic: {item.get('skill')}")
-            # CALLS THE INTERVIEWER ENGINE
-            st.write(generate_questions(item.get('skill')))
-            st.text_area("Draft your clinical-to-corporate answer here:", key=f"ans_{item.get('skill')}")
-
-    with tab4:
         for item in res.get("detailed_results", []):
             if item.get("gap", 0) > 0:
-                st.subheader(f"Path to Mastery: {item.get('skill')}")
+                st.subheader(f"Strategy: {item.get('skill')}")
                 st.markdown(item.get("learning_plan"))
 
 st.caption("Made with ❤️ by Arunjyoti Das | MA Clinical Psychology")
