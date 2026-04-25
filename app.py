@@ -6,17 +6,7 @@ from report import generate_pdf
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
-# Session State
-if "jd" not in st.session_state:
-    st.session_state.jd = ""
-if "resume" not in st.session_state:
-    st.session_state.resume = ""
-if "analysis_result" not in st.session_state:
-    st.session_state.analysis_result = None
-if "user_answers" not in st.session_state:
-    st.session_state.user_answers = {}
-
-# COMPLETE DEMO DATA - ADDED ONLY
+# COMPLETE DEMO DATA - FULLY STATIC
 DEMO_JD = """We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
