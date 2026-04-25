@@ -1,14 +1,14 @@
 import os, json, streamlit as st
 from google import genai
-from prompts import comprehensive_analysis_prompt, learning_plan_prompt
+from prompts import comprehensive_analysis_prompt, learning_plan_prompt, question_generation_prompt
 
 API_KEY = st.secrets.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 def run_assessment(jd, resume):
+    """Core Agent Layer using Organizational Psychologist Persona"""
     if not client: return {"summary": "API Key Missing", "detailed_results": []}
 
-    # Restoring YOUR exact analysis engine
     prompt = comprehensive_analysis_prompt(jd, resume)
 
     try:
@@ -18,16 +18,19 @@ def run_assessment(jd, resume):
 
         results = []
         for s in data.get("skill_analysis", []):
-            gap = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
+            # WEIGHTED GAP ENGINE
+            req = s.get("jd_required_level", 0)
+            curr = s.get("resume_demonstrated_level", 0)
+            gap_val = req - curr
             
-            # Using YOUR learning plan engine from prompts.py
-            plan = learning_plan_prompt(s.get("skill"), gap)
+            # LEARNING ENGINE
+            plan = learning_plan_prompt(s.get("skill"), gap_val)
             
             results.append({
                 "skill": s.get("skill"),
-                "jd_required": s.get("jd_required_level"),
-                "current_level": s.get("resume_demonstrated_level"),
-                "gap": gap,
+                "jd_required": req,
+                "current_level": curr,
+                "gap": gap_val,
                 "priority": s.get("priority"),
                 "feedback": s.get("rationale"),
                 "learning_plan": plan
@@ -40,7 +43,13 @@ def run_assessment(jd, resume):
             "detailed_results": results
         }
     except Exception as e:
-        return {"summary": f"Engine Error: {e}", "detailed_results": []}
+        return {"summary": "Analysis failed.", "detailed_results": []}
 
 def generate_questions(skill):
-    return f"As a clinical psychology graduate, how would you leverage your empathy to manage {skill} in a corporate environment?"
+    """Behavioral Interviewer Engine from prompts.py"""
+    prompt = question_generation_prompt(skill)
+    try:
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        return response.text
+    except:
+        return "Can you describe how you apply psychological insights to this area?"
