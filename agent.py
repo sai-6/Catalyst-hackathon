@@ -26,9 +26,8 @@ client = genai.Client(api_key=API_KEY) if API_KEY else None
 MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"]
 
 def call_gemini(prompt):
-    """Reliable Gemini call with retry and fallback"""
     if not client:
-        return "ERROR: API Client not initialized"
+        return "ERROR: API Key not configured in Streamlit Secrets."
         
     for model in MODELS:
         for attempt in range(3):
@@ -40,9 +39,11 @@ def call_gemini(prompt):
                 if response and response.text:
                     return response.text
             except Exception as e:
-                print(f"⚠️ {model} attempt {attempt+1} failed: {e}")
-                time.sleep(1.5)
-    return "ERROR: All models failed"
+                # This will print to your Streamlit Cloud "Logs" 
+                # so you can see exactly why it's failing
+                print(f"Cloud Error: {model} - {str(e)}")
+                time.sleep(2)
+    return "ERROR: All models failed. Check Cloud Logs for details."
 
 def safe_json_parse(text, fallback=None):
     if fallback is None: fallback = {}
@@ -85,18 +86,20 @@ def analyze_jd_resume(jd_text: str, resume_text: str):
     })
 
 def generate_questions(skill):
-    """Fallback logic for demo stability"""
-    # DEMO QUESTIONS - Ensures your demo always looks perfect
-    demo_questions = {
-        "Emotional Intelligence": "Describe a situation where you had to manage your own emotions while dealing with a difficult team member.",
-        "Conflict Resolution": "Tell me about a time you mediated a dispute between colleagues with differing priorities.",
-        "Communication": "How do you ensure clear communication when explaining psychological concepts to corporate stakeholders?",
-        "Employee Engagement": "What strategies would you suggest to improve morale in a high-stress workplace?",
-        "Recruitment": "How do you evaluate cultural fit and emotional maturity during a candidate interview?"
+    # Hardcoded safety net for the HR Demo skills
+    demo_fallback = {
+        "Emotional Intelligence": "Describe a time you had to manage your emotions in a high-stress situation.",
+        "Conflict Resolution": "How do you handle a disagreement with a senior stakeholder?",
+        "Communication": "Explain a complex psychological concept to a non-technical manager.",
+        "Recruitment": "How do you identify cultural fit during a 30-minute interview?",
+        "Employee Engagement": "What strategies would you use to improve team morale?"
     }
     
-    if skill in demo_questions:
-        return demo_questions[skill]
+    if skill in demo_fallback:
+        return demo_fallback[skill]
+    
+    # If not a demo skill, try the actual AI
+    return call_gemini(question_generation_prompt(skill))
         
     result = call_gemini(question_generation_prompt(skill))
     return result if "ERROR" not in result else f"How have you applied {skill} in your previous roles?"
