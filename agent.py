@@ -1,68 +1,56 @@
 import os
 import json
-import time
 import streamlit as st
 from google import genai
+from prompts import comprehensive_analysis_prompt, learning_plan_prompt
 
-# GLOBAL CONFIG
-MODELS = ["gemini-1.5-flash", "gemini-2.0-flash"]
-client = None
+# API Config using Streamlit Secrets
+API_KEY = st.secrets.get("GOOGLE_API_KEY")
+client = genai.Client(api_key=API_KEY) if API_KEY else None
 
-# Initialize Client
-API_KEY = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
-if API_KEY:
-    try:
-        client = genai.Client(api_key=API_KEY)
-    except Exception as e:
-        print(f"LOG: Client Init Failed: {e}")
-
-def call_gemini(prompt):
+def run_assessment(jd, resume):
+    """Core Agent Layer using Organizational Psychologist Persona from prompts.py"""
     if not client:
-        return "ERROR: No Client"
-    for model in MODELS:
-        try:
-            response = client.models.generate_content(model=model, contents=prompt)
-            if response.text: return response.text
-        except Exception as e:
-            print(f"LOG: Model {model} failed: {e}")
-            continue
-    return "ERROR"
+        return {"summary": "API Key Missing", "detailed_results": []}
 
-def safe_json_parse(text, fallback):
-    if not text or "ERROR" in text: return fallback
+    # Restoring YOUR exact prompt function
+    prompt = comprehensive_analysis_prompt(jd, resume)
+
     try:
-        # Extract JSON between curly braces
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        text = response.text
+        # Safety JSON parsing
         start = text.find('{')
         end = text.rfind('}') + 1
-        return json.loads(text[start:end])
-    except:
-        return fallback
+        data = json.loads(text[start:end])
 
-def run_assessment(jd, resume, answers):
-    print("LOG: run_assessment triggered in agent.py")
-    
-    # Simple prompt for testing
-    prompt = f"Analyze match between JD: {jd} and Resume: {resume}. Return JSON: {{'match_percentage': 80, 'summary': 'test', 'skill_analysis': [{{'skill': 'Communication', 'jd_required_level': 5, 'resume_level': 3, 'rationale': 'test', 'priority': 'High'}}]}}"
-    
-    raw_response = call_gemini(prompt)
-    analysis = safe_json_parse(raw_response, {"skill_analysis": []})
-    
-    # Process results... (simplified for stability)
-    results = []
-    for item in analysis.get("skill_analysis", []):
-        results.append({
-            "skill": item.get("skill"),
-            "current_level": item.get("resume_level"),
-            "gap": item.get("jd_required_level") - item.get("resume_level"),
-            "feedback": item.get("rationale"),
-            "learning_plan": "Review industry basics."
-        })
-        
-    return {
-        "match_percentage": analysis.get("match_percentage", 0),
-        "summary": analysis.get("summary", "Analysis failed."),
-        "detailed_results": results
-    }
+        results = []
+        for s in data.get("skill_analysis", []):
+            gap_val = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
+            
+            # Using YOUR learning plan engine from prompts.py
+            plan = learning_plan_prompt(s.get("skill"), gap_val)
+            
+            results.append({
+                "skill": s.get("skill"),
+                "jd_required": s.get("jd_required_level"),
+                "current_level": s.get("resume_demonstrated_level"),
+                "gap": gap_val,
+                "priority": s.get("priority", "Medium"),
+                "feedback": s.get("rationale"),
+                "learning_plan": plan
+            })
+
+        return {
+            "match_percentage": data.get("match_percentage", 0),
+            "summary": data.get("summary", ""),
+            "key_strengths": data.get("key_strengths", []),
+            "detailed_results": results
+        }
+    except Exception as e:
+        st.error(f"AI Engine Error: {e}")
+        return {"detailed_results": []}
 
 def generate_questions(skill):
-    return f"How have you applied {skill} in your past roles?"
+    """Generates Interviewer Questions based on your architecture"""
+    return f"Based on your psychological training, how would you approach a challenge involving {skill} in a corporate environment?"
