@@ -5,7 +5,7 @@ from report import generate_pdf
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
-# --- ORIGINAL DEMO DATA (REINSTATED FROM README) ---
+# --- DATA FROM YOUR README (THE DEMO RESPONSES) ---
 DEMO_JD = """We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
@@ -22,25 +22,25 @@ if "jd_input" not in st.session_state: st.session_state.jd_input = ""
 if "resume_input" not in st.session_state: st.session_state.resume_input = ""
 if "analysis_result" not in st.session_state: st.session_state.analysis_result = None
 
-# --- SIDEBAR (Original Functionality) ---
+# --- SIDEBAR (DEMO & NEW ASSESSMENT CONTROLS) ---
 with st.sidebar:
     st.header("🧠 SkillBridge AI")
-    st.caption("Bridging Psychology into HR")
+    st.caption("Organizational Psychology Engine")
     
+    # NEW ASSESSMENT: Clears everything
     if st.button("🆕 New Assessment", use_container_width=True):
-        st.session_state.jd_input = ""
-        st.session_state.resume_input = ""
-        st.session_state.analysis_result = None
+        st.session_state.clear()
         st.rerun()
 
+    # AUTO DEMO: Loads the specific JD/Resume from your README
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
         st.session_state.jd_input = DEMO_JD
         st.session_state.resume_input = DEMO_RESUME
-        st.session_state.analysis_result = None
+        st.session_state.analysis_result = None # Reset results to show fresh analysis
         st.rerun()
 
 st.title("🧠 SkillBridge AI")
-st.markdown("**AI-Powered Skill Assessment & Personalized Learning Agent**")
+st.markdown("*Bridging Clinical Psychology into HR & Organizational Development*")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -48,7 +48,7 @@ with col1:
 with col2:
     resume = st.text_area("📝 Resume", height=250, value=st.session_state.resume_input)
 
-# Force sync
+# Sync state
 st.session_state.jd_input = jd
 st.session_state.resume_input = resume
 
@@ -56,22 +56,22 @@ if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=Tru
     if not jd.strip() or not resume.strip():
         st.error("Please provide both inputs.")
     else:
-        with st.spinner("🧠 Organizational Psychology Engine Running..."):
+        with st.spinner("🧠 Running Intelligent Analysis Engine..."):
             result = run_assessment(jd, resume)
             st.session_state.analysis_result = result
             st.rerun()
 
-# --- DISPLAY RESULTS (Restored Architecture) ---
+# --- THE RESULTS ENGINE (RESTORED ARCHITECTURE) ---
 if st.session_state.analysis_result:
     res = st.session_state.analysis_result
     st.divider()
     
+    # PDF DOWNLOAD (Using report.py)
     col_score, col_pdf = st.columns([3, 1])
     with col_score:
-        st.subheader("📊 Assessment Summary")
-        st.metric("Overall Match Score", f"{res.get('match_percentage', 0)}%")
+        st.subheader("📊 Assessment Results")
+        st.metric("Overall Match Percentage", f"{res.get('match_percentage', 0)}%")
     with col_pdf:
-        # PDF Generation Restoration using your report.py
         pdf_path = "SkillBridge_Assessment_Report.pdf"
         generate_pdf(res, pdf_path)
         with open(pdf_path, "rb") as f:
@@ -88,13 +88,11 @@ if st.session_state.analysis_result:
     with tab2:
         for item in res.get("detailed_results", []):
             with st.expander(f"**{item.get('skill')}** (Gap: {item.get('gap')})"):
-                st.write(f"**Required:** {item.get('jd_required')} | **Current:** {item.get('current_level')}")
                 st.write(f"**Priority:** {item.get('priority')}")
                 st.write(f"**Rationale:** {item.get('feedback')}")
                 st.info(f"**Interviewer Question:** {generate_questions(item.get('skill'))}")
 
     with tab3:
-        st.markdown("## 📚 Personalized Learning Path")
         for item in res.get("detailed_results", []):
             if item.get("gap", 0) > 0:
                 st.subheader(f"Strategy for {item.get('skill')}")
