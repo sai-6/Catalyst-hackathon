@@ -1,115 +1,116 @@
-import os, time, json, re
+import os
+import json
+import time
 from dotenv import load_dotenv
 from google import genai
-import streamlit as st
-from prompts import *
+
+from prompts import (
+    skill_extraction_prompt,
+    question_generation_prompt,
+    evaluation_prompt,
+    learning_plan_prompt
+)
 
 load_dotenv()
 
-API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not API_KEY:
-    raise ValueError("Missing GOOGLE_API_KEY")
+    raise ValueError("❌ GOOGLE_API_KEY not found. Check .env")
 
 client = genai.Client(api_key=API_KEY)
 
-models = ["gemini-2.0-flash-lite", "gemini-flash-latest"]
+MODELS = ["gemini-2.0-flash-lite", "gemini-flash-latest"]
 
 
 def call_gemini(prompt):
-    for model in models:
-        for _ in range(2):
+    for model in MODELS:
+        for attempt in range(3):
             try:
-                res = client.models.generate_content(
+                response = client.models.generate_content(
                     model=model,
                     contents=prompt
                 )
-                return res.text
-            except:
-                time.sleep(1)
-    return "Error: Model unavailable"
+                return response.text
+            except Exception as e:
+                print(f"{model} attempt {attempt+1} failed:", e)
+                time.sleep(2)
+    return "ERROR"
 
 
-def parse_skills(text):
+def safe_json_parse(text, fallback):
     try:
-        return json.loads(text)["skills"]
+        return json.loads(text)
     except:
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        if match:
-            return json.loads(match.group()).get("skills", [])
-    return []
-
-
-def extract_number(text):
-    m = re.search(r'\b([1-5])\b', text)
-    return int(m.group(1)) if m else 3
+        return fallback
 
 
 def extract_skills(jd):
-    return parse_skills(call_gemini(skill_extraction_prompt(jd)))
+    response = call_gemini(skill_extraction_prompt(jd))
+    skills = safe_json_parse(response, [])
+    return skills if isinstance(skills, list) else []
 
 
 def generate_questions(skill):
     return call_gemini(question_generation_prompt(skill))
 
 
-def get_required_level(skill, jd):
-    return extract_number(call_gemini(required_level_prompt(skill, jd)))
-
-
-def evaluate_answer(skill, ans):
-    res = call_gemini(evaluation_prompt(skill, ans))
-    return extract_number(res), res
+def evaluate_answer(skill, answer):
+    response = call_gemini(evaluation_prompt(skill, answer))
+    parsed = safe_json_parse(response, {"score": 1, "reason": "Invalid response"})
+    return int(parsed.get("score", 1)), parsed.get("reason", "")
 
 
 def compute_gap(score, required):
-    raw = max(required - score, 0)
-    weighted = raw * (required / 5)
-    return round(weighted, 2), raw
+    return max(required - score, 0)
 
 
-def generate_followup(skill, question, answer):
-    return call_gemini(followup_question_prompt(skill, question, answer))
+def get_required_level(skill):
+    high = ["Conflict Resolution", "Communication", "Recruitment"]
+    medium = ["Employee Engagement", "Emotional Intelligence"]
 
-
-def generate_adaptive_question(skill, score):
-    return call_gemini(adaptive_question_prompt(skill, score))
+    if skill in high:
+        return 5
+    elif skill in medium:
+        return 4
+    return 3
 
 
 def generate_learning_plan(skill, gap):
     return call_gemini(learning_plan_prompt(skill, gap))
 
 
-def compute_confidence(results):
-    scores = [r["score"] for r in results]
-    gaps = [r["gap"] for r in results]
-    avg_score = sum(scores) / len(scores)
-    avg_gap = sum(gaps) / len(gaps)
-    return round((avg_score/5)*(1-(avg_gap/5))*100, 2)
-
-
 def run_assessment(jd, resume, answers):
     skills = extract_skills(jd)
+
     results = []
+    weighted_total = 0
+    total_weight = 0
 
     for skill in skills:
-        required = get_required_level(skill, jd)
         score, feedback = evaluate_answer(skill, answers.get(skill, ""))
+        required = get_required_level(skill)
+        gap = compute_gap(score, required)
+        plan = generate_learning_plan(skill, gap)
 
-        weighted_gap, raw_gap = compute_gap(score, required)
-        plan = generate_learning_plan(skill, raw_gap)
+        weight = required
+        weighted_total += score * weight
+        total_weight += weight
 
         results.append({
             "skill": skill,
-            "required": required,
             "score": score,
-            "gap": weighted_gap,
-            "raw_gap": raw_gap,
+            "required": required,
+            "gap": gap,
             "feedback": feedback,
             "learning_plan": plan
         })
 
-    overall = round(sum(r["score"] for r in results)/len(results), 2)
-    confidence = compute_confidence(results)
+    overall = weighted_total / total_weight if total_weight else 0
+    confidence = round((overall / 5) * 100, 2)
 
-    return {"skills": results, "overall_score": overall, "confidence": confidence}
+    return {
+        "skills": results,
+        "overall_score": round(overall, 2),
+        "confidence": confidence
+    }

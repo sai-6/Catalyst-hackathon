@@ -1,74 +1,109 @@
 import streamlit as st
-import os
 from agent import *
+import os
 
-st.set_page_config(page_title="SkillBridge AI", layout="centered")
+st.set_page_config(page_title="SkillBridge AI", layout="wide")
 
-# 🔐 API CHECK
-if not os.getenv("GOOGLE_API_KEY") and "GOOGLE_API_KEY" not in st.secrets:
-    st.error("Missing API Key. Add in .env or Streamlit secrets.")
-    st.stop()
+# ---------------- INIT SESSION ----------------
+if "jd" not in st.session_state:
+    st.session_state.jd = ""
 
-# UI
-st.title("🧠 SkillBridge AI Interview")
+if "resume" not in st.session_state:
+    st.session_state.resume = ""
 
 if "skills" not in st.session_state:
     st.session_state.skills = []
 
-if "index" not in st.session_state:
-    st.session_state.index = 0
-
 if "answers" not in st.session_state:
     st.session_state.answers = {}
 
-if "question" not in st.session_state:
-    st.session_state.question = ""
+# ---------------- SECURITY CHECK ----------------
+if not os.getenv("GOOGLE_API_KEY") and "GOOGLE_API_KEY" not in st.secrets:
+    st.error("❌ API key missing")
+    st.stop()
 
-jd = st.text_area("Paste Job Description")
+# ---------------- NEW ASSESSMENT ----------------
+if st.button("🆕 New Assessment"):
+    st.session_state.clear()
+    st.rerun()
 
-if st.button("Start Interview"):
+# ---------------- DEMO MODE (IMPORTANT: BEFORE UI) ----------------
+if st.button("🎯 Load Demo Scenario"):
+    st.session_state.jd = """We are hiring an HR Executive with strong skills in Communication,
+Conflict Resolution, Emotional Intelligence, Recruitment, and Employee Engagement."""
+
+    st.session_state.resume = """MA Clinical Psychology graduate with 1 year experience in counseling.
+Strong in empathy and emotional understanding. No corporate HR experience."""
+
+    st.session_state.skills = [
+        "Communication",
+        "Conflict Resolution",
+        "Emotional Intelligence",
+        "Recruitment",
+        "Employee Engagement"
+    ]
+
+    st.session_state.answers = {
+        "Communication": "Therapy communication but no workplace emails",
+        "Conflict Resolution": "Handled emotional conflicts but not workplace disputes",
+        "Emotional Intelligence": "Strong counseling-based understanding",
+        "Recruitment": "No experience",
+        "Employee Engagement": "Basic awareness"
+    }
+
+    st.success("✅ Demo loaded")
+    st.rerun()
+
+# ---------------- TITLE ----------------
+st.title("🧠 SkillBridge AI")
+st.subheader("AI-Powered Skill Assessment & Learning Agent")
+
+# ---------------- INPUTS ----------------
+jd = st.text_area("Job Description", key="jd")
+resume = st.text_area("Resume", key="resume")
+
+# ---------------- SKILL EXTRACTION ----------------
+if st.button("Extract Skills"):
     st.session_state.skills = extract_skills(jd)
-    st.session_state.index = 0
-    st.session_state.answers = {}
-    st.session_state.question = generate_questions(st.session_state.skills[0])
+
+# ---------------- INTERVIEW ----------------
+answers = {}
 
 if st.session_state.skills:
+    st.write("### 🧩 Extracted Skills")
+    st.write(st.session_state.skills)
 
-    skill = st.session_state.skills[st.session_state.index]
+    for i, skill in enumerate(st.session_state.skills):
+        st.subheader(skill)
 
-    st.subheader(f"Skill: {skill}")
-    st.progress((st.session_state.index+1)/len(st.session_state.skills))
+        st.write(generate_questions(skill))
 
-    st.write(st.session_state.question)
+        answers[skill] = st.text_area(
+            f"Answer for {skill}",
+            value=st.session_state.answers.get(skill, ""),
+            key=f"{skill}_{i}"
+        )
 
-    answer = st.text_area("Your Answer", key=f"ans_{skill}")
+# ---------------- RUN ----------------
+if st.button("Run Assessment"):
+    result = run_assessment(jd, resume, answers)
 
-    if st.button("Submit Answer"):
+    st.write("## 📊 Results")
 
-        st.session_state.answers[skill] = answer
+    st.write(f"### Overall Score: {result['overall_score']}")
+    st.write(f"### Confidence: {result['confidence']}%")
 
-        score, feedback = evaluate_answer(skill, answer)
+    if result["overall_score"] >= 4:
+        st.success("✅ Strong Fit")
+    elif result["overall_score"] >= 3:
+        st.warning("⚠️ Trainable")
+    else:
+        st.error("❌ Not Ready")
 
-        st.write(f"Score: {score}/5")
-        st.write(feedback)
+    for r in result["skills"]:
+        st.markdown(f"### {r['skill']}")
+        st.write(f"Score: {r['score']} | Required: {r['required']} | Gap: {r['gap']}")
+        st.write(r["feedback"])
 
-        followup = generate_followup(skill, st.session_state.question, answer)
-        st.session_state.question = followup
-
-    if st.button("Next Skill"):
-
-        st.session_state.index += 1
-
-        if st.session_state.index < len(st.session_state.skills):
-            st.session_state.question = generate_questions(
-                st.session_state.skills[st.session_state.index]
-            )
-        else:
-            result = run_assessment(jd, "", st.session_state.answers)
-
-            st.success("Interview Complete")
-            st.metric("Score", result["overall_score"])
-            st.metric("Confidence", f"{result['confidence']}%")
-
-            for r in result["skills"]:
-                st.write(f"{r['skill']} → {r['score']}")
+        with st.expander("📘 Learning Plan"):
+            st.write(r["learning_plan"])

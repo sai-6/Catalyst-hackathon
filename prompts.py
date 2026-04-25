@@ -1,28 +1,8 @@
 def skill_extraction_prompt(jd):
     return f"""
-Extract key skills from this Job Description.
+Extract all key skills from this Job Description.
 
-Return ONLY valid JSON:
-{{ "skills": ["Skill1", "Skill2"] }}
-
-Rules:
-- 5–10 skills max
-- No explanation
-
-JD:
-{jd}
-"""
-
-
-def required_level_prompt(skill, jd):
-    return f"""
-Determine required level for skill: "{skill}"
-
-Scale:
-1 Basic | 2 Beginner | 3 Working | 4 Strong | 5 Critical
-
-Return ONLY:
-Level: <1-5>
+Return ONLY a valid JSON list.
 
 JD:
 {jd}
@@ -30,57 +10,49 @@ JD:
 
 
 def question_generation_prompt(skill):
-    return f"Generate 1 clear interview question for: {skill}"
+    return f"""
+Generate 3 practical interview questions for: {skill}.
+"""
 
 
 def evaluation_prompt(skill, answer):
     return f"""
-Evaluate strictly.
+You are a strict evaluator.
+
+Evaluate ONLY what is written. Do NOT assume missing info.
 
 Skill: {skill}
-Answer: {answer}
+
+Answer:
+{answer}
+
+Scoring:
+1 = No understanding
+2 = Basic
+3 = Moderate
+4 = Strong
+5 = Expert
 
 Rules:
-- Do NOT assume missing info
-- Be strict
+- Do NOT over-score vague answers
+- Penalize lack of examples
 
-Return:
-Score: <1-5>
-Reason: short
-"""
-
-
-def followup_question_prompt(skill, question, answer):
-    return f"""
-Skill: {skill}
-Question: {question}
-Answer: {answer}
-
-Ask 1 deep follow-up question.
-"""
-
-
-def adaptive_question_prompt(skill, score):
-    return f"""
-Skill: {skill}
-Score: {score}
-
-Generate next question:
-- 4–5 → advanced
-- 2–3 → conceptual
-- 1 → basic
+Return ONLY JSON:
+{{
+  "score": number,
+  "reason": "short explanation"
+}}
 """
 
 
 def learning_plan_prompt(skill, gap):
     return f"""
-Create learning plan for {skill}
+Create a short learning plan for {skill}.
 
 Gap: {gap}
 
 Include:
-- Adjacent skills
-- Time estimate
 - Resources
-- Tasks
+- Practice tasks
+- Time estimate
 """
