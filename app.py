@@ -1,6 +1,7 @@
 import streamlit as st
 from agent import run_assessment, generate_questions, get_readme_demo_results, evaluate_candidate_answer
 from report import generate_pdf
+import io
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
@@ -20,6 +21,7 @@ Limited corporate HR exposure but strong foundation in human behavior."""
 if "jd_input" not in st.session_state: st.session_state.jd_input = ""
 if "resume_input" not in st.session_state: st.session_state.resume_input = ""
 if "analysis_result" not in st.session_state: st.session_state.analysis_result = None
+if "is_demo" not in st.session_state: st.session_state.is_demo = False
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -31,6 +33,7 @@ with st.sidebar:
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
         st.session_state.jd_input = README_JD
         st.session_state.resume_input = README_RESUME
+        st.session_state.is_demo = True
         st.session_state.analysis_result = get_readme_demo_results()
         st.rerun()
 
@@ -48,6 +51,7 @@ if st.button("🔍 Analyze Real-Time (API)", type="primary", use_container_width
     if not jd_box.strip() or not resume_box.strip():
         st.error("Please provide both inputs.")
     else:
+        st.session_state.is_demo = False
         with st.spinner("🧠 Running Organizational Psychology Engine..."):
             st.session_state.analysis_result = run_assessment(jd_box, resume_box)
             st.rerun()
@@ -63,19 +67,12 @@ if st.session_state.analysis_result:
         st.metric("Overall Match Percentage", f"{res.get('match_percentage', 0)}%")
     
     with col_pdf:
-        # OPTIONAL PDF GENERATION: Now applies to both Demo and API
-        def prepare_report():
-            pdf_path = "SkillBridge_AI_Report.pdf"
-            generate_pdf(res, pdf_path)
-            with open(pdf_path, "rb") as f: return f.read()
-
-        st.download_button(
-            label="📥 Generate & Download PDF",
-            data=prepare_report(),
-            file_name="SkillBridge_Assessment_Report.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
+        # MANUAL GENERATION ONLY: No file is created until this button is clicked
+        pdf_filename = "SkillBridge_Assessment_Report.pdf"
+        if st.button("📄 Generate Report", use_container_width=True):
+            generate_pdf(res, pdf_filename)
+            with open(pdf_filename, "rb") as f:
+                st.download_button("📥 Click to Download", f, file_name=pdf_filename, use_container_width=True)
 
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Summary", "🔍 Gap Analysis", "📚 Learning Plans", "❓ Interview Prep"])
     
@@ -94,18 +91,29 @@ if st.session_state.analysis_result:
                 st.markdown(item.get("learning_plan"))
 
     with tab4:
-        st.info("🧠 **Real-Time Scoring:** Answer the questions below to receive an instant evaluation.")
+        st.info("🧠 **Interview Preparation & Scoring**")
         for item in res.get("detailed_results", []):
             skill_name = item.get('skill')
             st.subheader(f"Topic: {skill_name}")
-            st.write(generate_questions(skill_name))
             
+            # DETERMINISTIC QUESTIONS FOR DEMO
+            if st.session_state.is_demo and skill_name == "Conflict Resolution":
+                q = "How do you handle workplace mediation between two senior stakeholders?"
+            else:
+                q = generate_questions(skill_name)
+            
+            st.write(q)
             user_ans = st.text_area(f"Your Response for {skill_name}:", key=f"ans_{skill_name}")
-            if st.button(f"Evaluate {skill_name} Response", key=f"btn_{skill_name}"):
-                if user_ans.strip():
-                    with st.spinner("Evaluating psychology-to-HR bridge..."):
+            
+            if st.button(f"Evaluate {skill_name}", key=f"btn_{skill_name}"):
+                if st.session_state.is_demo:
+                    # Deterministic Answer for Demo
+                    st.success("**Score: 4/5**")
+                    st.write("**Interviewer Feedback:** Strong use of clinical mediation techniques adapted for corporate hierarchy.")
+                else:
+                    with st.spinner("Scoring response..."):
                         score_data = evaluate_candidate_answer(skill_name, user_ans)
                         st.success(f"**Score: {score_data.get('score')}/5**")
-                        st.write(f"**Interviewer Feedback:** {score_data.get('reason')}")
-                else:
-                    st.warning("Please enter an answer to evaluate.")
+                        st.write(f"**Feedback:** {score_data.get('reason')}")
+
+st.caption("Made with ❤️ by Arunjyoti Das | MA Clinical Psychology")
