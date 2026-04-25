@@ -16,6 +16,70 @@ if "analysis_result" not in st.session_state:
 if "user_answers" not in st.session_state:
     st.session_state.user_answers = {}
 
+# Demo Data - Embedded directly in code
+DEMO_JD = """We are hiring an HR Executive with strong expertise in:
+- Communication and Stakeholder Management
+- Conflict Resolution and Mediation
+- Employee Engagement and Retention Strategies
+- Recruitment and Talent Acquisition
+- Emotional Intelligence and Team Dynamics"""
+
+DEMO_RESUME = """MA in Clinical Psychology (2025). 
+1 year experience as Counselor in rehabilitation setting. 
+Skilled in empathy, active listening, emotional regulation, and supporting individuals through difficult situations. 
+Limited corporate HR exposure but strong foundation in human behavior and psychology."""
+
+DEMO_ANALYSIS_RESULT = {
+    "match_percentage": 68,
+    "summary": "Strong psychological foundation with excellent emotional intelligence and conflict resolution skills from counseling experience. Needs corporate HR exposure in recruitment, stakeholder management, and employee engagement strategies.",
+    "key_strengths": [
+        "Exceptional emotional intelligence from clinical psychology background",
+        "Proven conflict resolution skills from counseling practice",
+        "Strong empathy and active listening abilities",
+        "Solid foundation in human behavior analysis"
+    ],
+    "detailed_results": [
+        {
+            "skill": "Emotional Intelligence",
+            "gap": 10,
+            "feedback": "Excellent foundation from counseling work. Can directly apply to team dynamics and leadership.",
+            "learning_plan": "1. Read 'Emotional Intelligence 2.0' by Travis Bradberry\n2. Practice EQ assessments with corporate scenarios\n3. Complete LinkedIn Learning: 'Developing Executive Presence'"
+        },
+        {
+            "skill": "Conflict Resolution",
+            "gap": 15,
+            "feedback": "Strong mediation skills from family counseling. Translate to workplace scenarios.",
+            "learning_plan": "1. Case studies: Workplace conflict scenarios\n2. Harvard online: 'Negotiation Mastery'\n3. Role-play corporate mediation exercises"
+        },
+        {
+            "skill": "Communication",
+            "gap": 25,
+            "feedback": "Empathetic communication strong. Needs corporate stakeholder communication practice.",
+            "learning_plan": "1. Toastmasters or corporate communication workshop\n2. Practice executive presentations\n3. LinkedIn Learning: 'Strategic Communication'"
+        },
+        {
+            "skill": "Employee Engagement",
+            "gap": 45,
+            "feedback": "Psychology knowledge applicable but lacks corporate retention strategy experience.",
+            "learning_plan": "1. Gallup employee engagement courses\n2. Study retention benchmarking data\n3. Analyze company turnover case studies"
+        },
+        {
+            "skill": "Recruitment",
+            "gap": 60,
+            "feedback": "No corporate recruitment experience. Strong assessment skills can be leveraged.",
+            "learning_plan": "1. LinkedIn Recruiter certification\n2. ATS (Applicant Tracking System) training\n3. Behavioral interviewing workshops"
+        }
+    ]
+}
+
+DEMO_USER_ANSWERS = {
+    "Emotional Intelligence": "I have developed strong emotional intelligence through my counseling work, helping clients regulate emotions during difficult sessions. I can read emotional cues quickly and respond appropriately, which I believe translates well to managing team dynamics.",
+    "Conflict Resolution": "In counseling, I mediated emotional conflicts between family members and clients effectively. I've de-escalated high-tension situations and found win-win solutions, skills directly applicable to workplace mediation.",
+    "Communication": "I communicate clearly and empathetically with clients from diverse backgrounds in therapy sessions. My active listening skills help build trust quickly, essential for stakeholder management.",
+    "Employee Engagement": "While my experience is clinical, I understand motivation theories and can apply them to retention strategies. Need corporate context but have strong behavioral insights.",
+    "Recruitment": "Limited experience but skilled in psychological assessment. Eager to learn corporate hiring processes and ATS systems."
+}
+
 # API Check
 API_KEY = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 if not API_KEY:
@@ -32,31 +96,11 @@ with st.sidebar:
         st.rerun()
 
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
-        st.session_state.jd = """We are hiring an HR Executive with strong expertise in:
-- Communication and Stakeholder Management
-- Conflict Resolution and Mediation
-- Employee Engagement and Retention Strategies
-- Recruitment and Talent Acquisition
-- Emotional Intelligence and Team Dynamics"""
-
-        st.session_state.resume = """MA in Clinical Psychology (2025). 
-1 year experience as Counselor in rehabilitation setting. 
-Skilled in empathy, active listening, emotional regulation, and supporting individuals through difficult situations. 
-Limited corporate HR exposure but strong foundation in human behavior and psychology."""
-
-        # Auto-run analysis for demo
-        with st.spinner("Loading demo and running analysis..."):
-            result = run_assessment(st.session_state.jd, st.session_state.resume, {})
-            st.session_state.analysis_result = result
-            
-            # Pre-fill some sample answers so video looks complete
-            st.session_state.user_answers = {
-                "Emotional Intelligence": "I have developed strong emotional intelligence through my counseling work, helping clients regulate emotions during difficult sessions.",
-                "Conflict Resolution": "In counseling, I mediated emotional conflicts between family members and clients effectively.",
-                "Communication": "I communicate clearly and empathetically with clients from diverse backgrounds in therapy sessions."
-            }
-        
-        st.success("✅ Demo Loaded & Analysis Completed!")
+        st.session_state.jd = DEMO_JD
+        st.session_state.resume = DEMO_RESUME
+        st.session_state.analysis_result = DEMO_ANALYSIS_RESULT
+        st.session_state.user_answers = DEMO_USER_ANSWERS
+        st.success("✅ Demo Loaded with Complete Analysis!")
         st.rerun()
 
 # Main UI
