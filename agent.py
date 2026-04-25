@@ -115,3 +115,4 @@ def run_assessment(jd_text: str, resume_text: str, user_answers: dict):
         "key_strengths": analysis.get("key_strengths", []),
         "critical_gaps": analysis.get("critical_gaps", []),
         "summary": analysis.get("summary", "")
+    }
