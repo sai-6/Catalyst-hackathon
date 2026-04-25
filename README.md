@@ -33,7 +33,7 @@ graph TD
 
     style A fill:#e3f2fd,stroke:#1976d2
     style D fill:#f3e5f5,stroke:#7b1fa2
-
+```
 
 🎯 Full Demo: Input → Output1. Input DataJob Description (HR Executive):PlaintextWe are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
