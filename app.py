@@ -5,7 +5,7 @@ from report import generate_pdf
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
-# --- DATA FROM YOUR README (THE DEMO RESPONSES) ---
+# --- DATA FROM YOUR README (REINSTATED) ---
 DEMO_JD = """We are hiring an HR Executive with strong expertise in:
 - Communication and Stakeholder Management
 - Conflict Resolution and Mediation
@@ -17,30 +17,30 @@ DEMO_RESUME = """MA in Clinical Psychology (2025). 1 year experience as Counselo
 Skilled in empathy, active listening, and emotional regulation.
 Limited corporate HR exposure but strong foundation in human behavior."""
 
-# --- SESSION STATE ---
+# --- SESSION STATE MANAGEMENT ---
 if "jd_input" not in st.session_state: st.session_state.jd_input = ""
 if "resume_input" not in st.session_state: st.session_state.resume_input = ""
 if "analysis_result" not in st.session_state: st.session_state.analysis_result = None
 
-# --- SIDEBAR (DEMO & NEW ASSESSMENT CONTROLS) ---
+# --- SIDEBAR (DEMO & NEW ASSESSMENT) ---
 with st.sidebar:
     st.header("🧠 SkillBridge AI")
-    st.caption("Organizational Psychology Engine")
+    st.caption("Bridging Psychology into HR")
     
-    # NEW ASSESSMENT: Clears everything
     if st.button("🆕 New Assessment", use_container_width=True):
-        st.session_state.clear()
+        st.session_state.jd_input = ""
+        st.session_state.resume_input = ""
+        st.session_state.analysis_result = None
         st.rerun()
 
-    # AUTO DEMO: Loads the specific JD/Resume from your README
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
         st.session_state.jd_input = DEMO_JD
         st.session_state.resume_input = DEMO_RESUME
-        st.session_state.analysis_result = None # Reset results to show fresh analysis
+        st.session_state.analysis_result = None
         st.rerun()
 
 st.title("🧠 SkillBridge AI")
-st.markdown("*Bridging Clinical Psychology into HR & Organizational Development*")
+st.markdown("**AI-Powered Skill Assessment & Personalized Learning Agent**")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -56,28 +56,28 @@ if st.button("🔍 Analyze JD & Resume", type="primary", use_container_width=Tru
     if not jd.strip() or not resume.strip():
         st.error("Please provide both inputs.")
     else:
-        with st.spinner("🧠 Running Intelligent Analysis Engine..."):
+        with st.spinner("🧠 Organizational Psychology Engine Running..."):
             result = run_assessment(jd, resume)
             st.session_state.analysis_result = result
             st.rerun()
 
-# --- THE RESULTS ENGINE (RESTORED ARCHITECTURE) ---
+# --- THE RESULTS ENGINE (RESTORED) ---
 if st.session_state.analysis_result:
     res = st.session_state.analysis_result
     st.divider()
     
-    # PDF DOWNLOAD (Using report.py)
     col_score, col_pdf = st.columns([3, 1])
     with col_score:
         st.subheader("📊 Assessment Results")
         st.metric("Overall Match Percentage", f"{res.get('match_percentage', 0)}%")
     with col_pdf:
-        pdf_path = "SkillBridge_Assessment_Report.pdf"
-        generate_pdf(res, pdf_path)
-        with open(pdf_path, "rb") as f:
-            st.download_button("📥 Download PDF Report", f, file_name=pdf_path, use_container_width=True)
+        # PDF Generation Restoration (report.py)
+        pdf_file = "SkillBridge_AI_Report.pdf"
+        generate_pdf(res, pdf_file)
+        with open(pdf_file, "rb") as f:
+            st.download_button("📥 Download PDF Report", f, file_name=pdf_file, use_container_width=True)
 
-    tab1, tab2, tab3 = st.tabs(["📊 Executive Summary", "🔍 Gap Analysis", "📚 Learning Plans"])
+    tab1, tab2, tab3 = st.tabs(["📊 Summary", "🔍 Gap Analysis", "📚 Learning Plans"])
     
     with tab1:
         st.write(res.get("summary", ""))
@@ -90,7 +90,7 @@ if st.session_state.analysis_result:
             with st.expander(f"**{item.get('skill')}** (Gap: {item.get('gap')})"):
                 st.write(f"**Priority:** {item.get('priority')}")
                 st.write(f"**Rationale:** {item.get('feedback')}")
-                st.info(f"**Interviewer Question:** {generate_questions(item.get('skill'))}")
+                st.info(f"**Interview Question:** {generate_questions(item.get('skill'))}")
 
     with tab3:
         for item in res.get("detailed_results", []):

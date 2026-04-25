@@ -7,10 +7,10 @@ API_KEY = st.secrets.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY) if API_KEY else None
 
 def run_assessment(jd, resume):
-    """Core Agent using Organizational Psychologist Persona and Gaps Engine"""
+    """Core Agent Layer using Organizational Psychologist Persona and Gaps Engine"""
     if not client: return {"summary": "API Key Missing", "detailed_results": []}
 
-    # RESTORED: Using YOUR exact prompt engine
+    # RESTORED: Using YOUR exact prompt engine from prompts.py
     prompt = comprehensive_analysis_prompt(jd, resume)
 
     try:
@@ -20,7 +20,7 @@ def run_assessment(jd, resume):
 
         results = []
         for s in data.get("skill_analysis", []):
-            # THE GAP ENGINE LOGIC
+            # THE GAP ENGINE LOGIC (JD Required - Resume Demonstrated)
             gap_val = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
             
             # THE LEARNING ENGINE LOGIC (From prompts.py)
@@ -42,9 +42,9 @@ def run_assessment(jd, resume):
             "key_strengths": data.get("key_strengths", []),
             "detailed_results": results
         }
-    except Exception:
-        return {"summary": "Analysis Error", "detailed_results": []}
+    except Exception as e:
+        return {"summary": f"Analysis Error: {e}", "detailed_results": []}
 
 def generate_questions(skill):
-    """Generates behavioral questions for the assessment"""
+    """Generates behavioral questions as per your original architecture"""
     return f"How do you apply your clinical psychology empathy to manage {skill} in a corporate environment?"
