@@ -69,7 +69,7 @@ with st.sidebar:
     if st.button("🆕 New Assessment", use_container_width=True):
         st.session_state.jd_input = ""
         st.session_state.resume_input = ""
-        st.session_state.analysis_result = None
+        st.session_state.analysis_result = None  # Ensure this is None
         st.session_state.user_answers = {}
         st.rerun()
 
