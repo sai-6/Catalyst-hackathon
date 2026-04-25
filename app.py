@@ -1,6 +1,7 @@
 import streamlit as st
 from agent import run_assessment, generate_questions, get_readme_demo_results
 from report import generate_pdf
+import io
 
 st.set_page_config(page_title="SkillBridge AI", layout="wide", page_icon="🧠")
 
@@ -33,7 +34,6 @@ with st.sidebar:
     if st.button("🎯 Load HR Executive Demo", use_container_width=True):
         st.session_state.jd_input = README_JD
         st.session_state.resume_input = README_RESUME
-        # Deterministic load: No API needed for the Demo as per your requirements
         st.session_state.analysis_result = get_readme_demo_results()
         st.rerun()
 
@@ -58,7 +58,7 @@ if st.button("🔍 Analyze Real-Time (API)", type="primary", use_container_width
             st.session_state.analysis_result = result
             st.rerun()
 
-# --- RESULTS ENGINE ---
+# --- RESULTS ENGINE (WITH CHOICE-BASED DOWNLOAD) ---
 if st.session_state.analysis_result:
     res = st.session_state.analysis_result
     st.divider()
@@ -67,11 +67,22 @@ if st.session_state.analysis_result:
     with col_score:
         st.subheader("📊 Executive Summary")
         st.metric("Overall Match Percentage", f"{res.get('match_percentage', 0)}%")
+    
     with col_pdf:
-        pdf_path = "SkillBridge_Assessment_Report.pdf"
-        generate_pdf(res, pdf_path) # Uses your report.py
-        with open(pdf_path, "rb") as f:
-            st.download_button("📥 Download PDF Report", f, file_name=pdf_path)
+        # OPTIONAL DOWNLOAD LOGIC: PDF is only generated on click
+        def prepare_report():
+            pdf_path = "SkillBridge_AI_Report.pdf"
+            generate_pdf(res, pdf_path)
+            with open(pdf_path, "rb") as f:
+                return f.read()
+
+        st.download_button(
+            label="📥 Generate & Download PDF",
+            data=prepare_report() if st.session_state.analysis_result else b"",
+            file_name="SkillBridge_Assessment_Report.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
 
     tab1, tab2, tab3 = st.tabs(["📊 Summary", "🔍 Gap Analysis", "📚 Learning Plans"])
     
