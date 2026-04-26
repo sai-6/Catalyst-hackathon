@@ -28,14 +28,14 @@ Also include:
 Be realistic and constructive. Psychology graduates often excel in empathy and emotional intelligence but may lack corporate HR processes.
 
 Return **ONLY** valid JSON. No extra text.
-{
+{{
   "match_percentage": 0-100,
   "overall_score": 0-5.0,
   "confidence": 0-100,
   "summary": "text",
   "key_strengths": ["...", "..."],
   "skill_analysis": [ {"skill": "...", "jd_required_level": 5, ...} ]
-}
+}}
 """
 
 
