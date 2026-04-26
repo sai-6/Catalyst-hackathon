@@ -1,5 +1,6 @@
 def comprehensive_analysis_prompt(jd: str, resume: str) -> str:
     """Main analysis prompt - JD + Resume combined"""
+    # Note the double {{ }} around the JSON structure below
     return f"""
 You are an expert Organizational Psychologist and Senior HR Talent Analyst with 15+ years experience.
 
@@ -29,12 +30,12 @@ Be realistic and constructive. Psychology graduates often excel in empathy and e
 
 Return **ONLY** valid JSON. No extra text.
 {{
-  "match_percentage": 0-100,
-  "overall_score": 0-5.0,
-  "confidence": 0-100,
+  "match_percentage": 0,
+  "overall_score": 0,
+  "confidence": 0,
   "summary": "text",
-  "key_strengths": ["...", "..."],
-  "skill_analysis": [ {"skill": "...", "jd_required_level": 5, ...} ]
+  "key_strengths": [],
+  "skill_analysis": [ {{ "skill": "text", "jd_required_level": 0, "resume_demonstrated_level": 0, "rationale": "text", "priority": "text" }} ]
 }}
 """
 
@@ -65,6 +66,7 @@ Example tone:
 
 def evaluation_prompt(skill: str, answer: str) -> str:
     """Strict but fair evaluator"""
+    # Note the double {{ }} around the JSON structure below
     return f"""
 You are a strict but fair evaluator with background in Clinical and Organizational Psychology.
 
@@ -89,8 +91,8 @@ Rules:
 
 Return **ONLY** this JSON:
 {{
-  "score": <integer 1-5>,
-  "reason": "<short constructive explanation (1-2 sentences)>"
+  "score": 0,
+  "reason": "text"
 }}
 """
 
