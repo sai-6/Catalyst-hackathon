@@ -48,7 +48,7 @@ We are hiring an HR Executive with strong expertise in:
 - Recruitment and Talent Acquisition
 - Emotional Intelligence and Team Dynamics
 
-* **Candidate Resume:**
+**Candidate Resume:**
 MA in Clinical Psychology (2025)
 - 1 year experience as Counselor. 
 - Skilled in empathy, active listening, and emotional regulation.
