@@ -72,9 +72,9 @@ Limited corporate HR exposure but strong foundation in human behavior.
 
 This use case demonstrates the agent's ability to identify transferable psychological traits in non-standard candidates.
 
-* [cite_start]**Input - Job Description (EdTech Product Manager):** Requires user research, stakeholder management, empathy-driven UX design, and roadmap prioritization. 
-* [cite_start]**Input - Candidate Resume (Secondary School Teacher):** 6 years experience in curriculum design, behavioral management of diverse groups, and data-driven student performance tracking. 
-* [cite_start]**Agent Insight:** The engine recognizes **"Classroom Behavioral Management"** as a direct transferable skill for **"High-Stakes Stakeholder Mediation"** and **"Curriculum Design"** as a foundation for **"Product Roadmapping."** 
+* **Input - Job Description (EdTech Product Manager):** Requires user research, stakeholder management, empathy-driven UX design, and roadmap prioritization.
+* **Input - Candidate Resume (Secondary School Teacher):** 6 years experience in curriculum design, behavioral management of diverse groups, and data-driven student performance tracking.
+* **Agent Insight:** The engine recognizes **"Classroom Behavioral Management"** as a direct transferable skill for **"High-Stakes Stakeholder Mediation"** and **"Curriculum Design"** as a foundation for **"Product Roadmapping."**
 
 ---
 
@@ -82,11 +82,11 @@ This use case demonstrates the agent's ability to identify transferable psycholo
 
 SkillBridge AI employs a weighted gap-analysis algorithm grounded in Organizational Psychology: 
 
-* [cite_start]**Weighted Alignment:** The "Match Percentage" is not a simple keyword count; it is a weighted average comparing the JD's "Required Level" against evidence-based "Demonstrated Levels" found in the resume. 
-* [cite_start]**Psychological Mapping:** The engine specifically looks for "bridge skills"—clinical traits like empathy and active listening are mapped to corporate competencies like negotiation and leadership. 
+* **Weighted Alignment:** The "Match Percentage" is not a simple keyword count; it is a weighted average comparing the JD's "Required Level" against evidence-based "Demonstrated Levels" found in the resume.
+* **Psychological Mapping:** The engine specifically looks for "bridge skills"—clinical traits like empathy and active listening are mapped to corporate competencies like negotiation and leadership.
 * **Gap Prioritization:** Gaps are calculated as:  
     $$Required - Demonstrated$$  
-    [cite_start]Any gap $\ge 2$ is automatically flagged as **"High Priority"** for the Learning Plan. 
+    Any gap $\ge 2$ is automatically flagged as **"High Priority"** for the Learning Plan.
 
 ---
 
@@ -110,7 +110,7 @@ To run this project locally for testing:
 4.  **Launch the App:**
     ```bash
     streamlit run app.py
-
+    ```
 ## 📚 Personalized Learning Plans
 
 * **Conflict Resolution:** Harvard online: 'Negotiation Mastery', role-play corporate mediation exercises.
