@@ -35,6 +35,8 @@ graph TD
     style D fill:#f3e5f5,stroke:#7b1fa2,color:#000,stroke-width:2px
 ```
 
+---
+
 ## 🎯 Full Demo: Input → Output
 
 ### 1. Input Data
