@@ -68,6 +68,13 @@ Limited corporate HR exposure but strong foundation in human behavior.
 
 ---
 
+## 📚 Personalized Learning Plans
+
+* **Conflict Resolution:** Harvard online: 'Negotiation Mastery', role-play corporate mediation exercises.
+* **Recruitment:** LinkedIn Recruiter certification, ATS (Applicant Tracking System) training.
+
+---
+
 ## 🌟 Real-World Use Case: The "Career Switcher" (Teacher to PM)
 
 This use case demonstrates the agent's ability to identify transferable psychological traits in non-standard candidates.
@@ -111,11 +118,6 @@ To run this project locally for testing:
     ```bash
     streamlit run app.py
     ```
-## 📚 Personalized Learning Plans
-
-* **Conflict Resolution:** Harvard online: 'Negotiation Mastery', role-play corporate mediation exercises.
-* **Recruitment:** LinkedIn Recruiter certification, ATS (Applicant Tracking System) training.
-
 ---
 
 ## 🧠 About the Author
