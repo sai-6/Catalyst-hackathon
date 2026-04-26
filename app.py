@@ -47,9 +47,11 @@ if st.session_state.analysis_result:
     
     col_score, col_pdf = st.columns([3, 1])
     with col_score:
-        st.subheader(f"Match: {res.get('match_percentage')}%")
+        st.subheader("📊 Executive Summary")
+        st.metric("Overall Match Percentage", f"{res.get('match_percentage', 0)}%")
+        st.progress(res.get('match_percentage', 0) / 100) # Match progress bar
+    
     with col_pdf:
-        # PURELY MANUAL PDF TRIGGER
         if st.button("📄 Generate Report PDF", use_container_width=True):
             pdf_name = "SkillBridge_Report.pdf"
             generate_pdf(res, pdf_name)
@@ -58,11 +60,14 @@ if st.session_state.analysis_result:
 
     tabs = st.tabs(["📊 Summary", "🔍 Gaps", "📚 Learning", "❓ Interview"])
     
-    with tabs[0]: st.write(res.get("summary"))
+    with tabs[0]: 
+        st.write(res.get("summary"))
+    
     with tabs[1]:
         for item in res.get("detailed_results", []):
             with st.expander(f"{item.get('skill')} (Gap: {item.get('gap')})"):
                 st.write(item.get("feedback"))
+    
     with tabs[2]:
         for item in res.get("detailed_results", []):
             st.markdown(f"### {item.get('skill')}\n{item.get('learning_plan')}")
@@ -72,18 +77,24 @@ if st.session_state.analysis_result:
         for item in res.get("detailed_results", []):
             skill = item.get('skill')
             q = item.get('demo_question') if st.session_state.is_demo else generate_questions(skill)
-            ans_val = item.get('demo_answer') if st.session_state.is_demo else ""
             
             st.subheader(skill)
             st.write(f"**Question:** {q}")
+            
+            if st.session_state.is_demo:
+                 st.caption("💡 Tip: This answer demonstrates how clinical mediation applies to HR.")
+            
+            ans_val = item.get('demo_answer') if st.session_state.is_demo else ""
             u_ans = st.text_area("Candidate Answer:", value=ans_val, key=f"t_{skill}")
             
             if st.button(f"Evaluate {skill}", key=f"b_{skill}"):
                 if st.session_state.is_demo:
-                    st.success(f"**Score: {item.get('demo_score')}/5**")
-                    st.write(f"**Feedback:** {item.get('demo_reason')}")
+                    st.success(f"**Score: {item.get('demo_score', 4)}/5**")
+                    st.write(f"**Feedback:** {item.get('demo_reason', 'Great answer.')}")
                 else:
                     with st.spinner("Scoring..."):
                         eval_res = evaluate_candidate_answer(skill, u_ans)
                         st.success(f"**Score: {eval_res.get('score')}/5**")
                         st.write(eval_res.get('reason'))
+
+st.caption("Made with ❤️ by Arunjyoti Das | MA Clinical Psychology")
