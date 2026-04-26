@@ -39,22 +39,56 @@ def get_readme_demo_results():
     }
 
 def run_assessment(jd, resume):
-    if not client: return {"summary": "API Key Missing", "detailed_results": []}
+    """The Live Analysis Engine using Gemini API with robust JSON parsing"""
+    if not client: 
+        return {"summary": "API Key Missing - Check Streamlit Secrets", "detailed_results": []}
+    
     prompt = comprehensive_analysis_prompt(jd, resume)
     try:
         response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-        data = json.loads(response.text[response.text.find('{'):response.text.rfind('}')+1])
+        text = response.text
+        
+        # 1. Robust JSON Extraction: Find the first '{' and last '}'
+        start_idx = text.find('{')
+        end_idx = text.rfind('}') + 1
+        
+        if start_idx == -1 or end_idx == 0:
+            print(f"DEBUG: Raw AI Response was: {text}") # Visible in Streamlit Logs
+            return {"summary": "Analysis failed: AI returned an invalid format.", "detailed_results": []}
+            
+        clean_json = text[start_idx:end_idx]
+        data = json.loads(clean_json)
+        
+        # 2. Key-Name Flexibility: Handle 'skill_analysis' or 'detailed_results'
+        skill_data = data.get("skill_analysis") or data.get("detailed_results") or []
+        
         results = []
-        for s in data.get("skill_analysis", []):
-            gap = s.get("jd_required_level", 0) - s.get("resume_demonstrated_level", 0)
+        for s in skill_data:
+            # Handle different possible key names from AI
+            req = s.get("jd_required_level") or s.get("jd_required") or 0
+            curr = s.get("resume_demonstrated_level") or s.get("current_level") or 0
+            gap = max(0, int(req) - int(curr))
+            
             results.append({
-                "skill": s.get("skill"), "jd_required": s.get("jd_required_level"),
-                "current_level": s.get("resume_demonstrated_level"), "gap": gap,
-                "priority": s.get("priority"), "feedback": s.get("rationale"),
-                "learning_plan": learning_plan_prompt(s.get("skill"), gap)
+                "skill": s.get("skill", "Unknown Skill"),
+                "jd_required": req,
+                "current_level": curr,
+                "gap": gap,
+                "priority": s.get("priority", "Medium"),
+                "feedback": s.get("rationale") or s.get("feedback", ""),
+                "learning_plan": learning_plan_prompt(s.get("skill", "this skill"), gap)
             })
-        return {"match_percentage": data.get("match_percentage", 0), "summary": data.get("summary", ""), "key_strengths": data.get("key_strengths", []), "detailed_results": results}
-    except: return {"summary": "Analysis failed.", "detailed_results": []}
+            
+        return {
+            "match_percentage": data.get("match_percentage", 0),
+            "summary": data.get("summary", "Analysis completed successfully."),
+            "key_strengths": data.get("key_strengths", []),
+            "detailed_results": results
+        }
+        
+    except Exception as e:
+        print(f"DEBUG: Error during analysis: {str(e)}") # Critical for debugging
+        return {"summary": f"Analysis failed: {str(e)}", "detailed_results": []}
 
 def generate_questions(skill):
     if not client: return "How does your background help you with this skill?"
